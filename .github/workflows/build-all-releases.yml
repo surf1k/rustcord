@@ -1,0 +1,129 @@
+name: Build Cross-Platform Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Release tag (e.g. v0.1.0)'
+        required: true
+        default: 'v0.1.0'
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  build-windows:
+    name: Build Windows (x86_64)
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@1.98.1
+      - name: Build release binary
+        run: cargo build --release --locked -p serein --bin rustcord
+      - name: Package Windows
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path dist-win
+          Copy-Item target/release/rustcord.exe dist-win/
+          Copy-Item README.md dist-win/
+          Copy-Item LICENSE-MIT dist-win/
+          Copy-Item packaging/windows/install-notifications.ps1 dist-win/
+          Compress-Archive -Path dist-win/* -DestinationPath rustcord-windows-x86_64.zip
+      - name: Upload Windows Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: rustcord-windows-x86_64
+          path: rustcord-windows-x86_64.zip
+
+  build-macos:
+    name: Build macOS (${{ matrix.arch }})
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: macos-latest
+            arch: arm64
+            target: aarch64-apple-darwin
+          - os: macos-13
+            arch: x86_64
+            target: x86_64-apple-darwin
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@1.98.1
+        with:
+          targets: ${{ matrix.target }}
+      - name: Build release binary
+        run: cargo build --release --locked -p serein --bin rustcord --target ${{ matrix.target }}
+      - name: Create macOS App Bundle
+        run: |
+          mkdir -p "Rustcord.app/Contents/MacOS"
+          mkdir -p "Rustcord.app/Contents/Resources"
+          cp "target/${{ matrix.target }}/release/rustcord" "Rustcord.app/Contents/MacOS/"
+          cp packaging/macos/Info.plist "Rustcord.app/Contents/"
+          cp README.md LICENSE-MIT Rustcord.app/Contents/Resources/
+          ditto -c -k --sequesterRsrc Rustcord.app "rustcord-macos-${{ matrix.arch }}.zip"
+      - name: Upload macOS Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: rustcord-macos-${{ matrix.arch }}
+          path: rustcord-macos-${{ matrix.arch }}.zip
+
+  build-linux:
+    name: Build Linux (x86_64)
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libgtk-4-dev libwebkitgtk-6.0-dev libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev libxkbcommon-dev libwayland-dev libx11-dev libasound2-dev libpulse-dev
+      - uses: dtolnay/rust-toolchain@1.98.1
+      - name: Build release binary
+        run: cargo build --release --locked -p serein --bin rustcord
+      - name: Package Linux tar.gz
+        run: |
+          mkdir -p dist-linux
+          cp target/release/rustcord dist-linux/
+          cp README.md LICENSE-MIT dist-linux/
+          strip dist-linux/rustcord
+          tar -czvf rustcord-linux-x86_64.tar.gz -C dist-linux rustcord README.md LICENSE-MIT
+      - name: Upload Linux Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: rustcord-linux-x86_64
+          path: rustcord-linux-x86_64.tar.gz
+
+  publish-release:
+    name: Publish Release Assets
+    needs: [build-windows, build-macos, build-linux]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          path: downloaded-artifacts
+          merge-multiple: true
+      - name: Publish Release to GitHub
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG_NAME: ${{ inputs.tag || github.ref_name }}
+        run: |
+          gh release upload "$TAG_NAME" downloaded-artifacts/* --clobber || \
+          gh release create "$TAG_NAME" downloaded-artifacts/* \
+            --title "Rustcord $TAG_NAME" \
+            --notes "### Rustcord $TAG_NAME - Cross-Platform Release
+
+          Native Discord client written in Rust.
+
+          #### Downloads
+          - **Windows (x86_64)**: \`rustcord-windows-x86_64.zip\`
+          - **macOS (Apple Silicon arm64)**: \`rustcord-macos-arm64.zip\`
+          - **macOS (Intel x86_64)**: \`rustcord-macos-x86_64.zip\`
+          - **Linux (x86_64)**: \`rustcord-linux-x86_64.tar.gz\`
+          "
