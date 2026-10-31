@@ -28,7 +28,7 @@ static SYSTEM: LazyLock<Language> =
 #[cfg(test)]
 static SYSTEM: LazyLock<Language> = LazyLock::new(|| Language::English);
 #[cfg(not(test))]
-static CURRENT: AtomicU8 = AtomicU8::new(Language::System as u8);
+static CURRENT: AtomicU8 = AtomicU8::new(Language::English as u8);
 
 struct ActiveBundle {
 	language: Language,
@@ -44,8 +44,8 @@ thread_local! {
 
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
 pub enum Language {
-	#[default]
 	System,
+	#[default]
 	English,
 	Spanish,
 	French,

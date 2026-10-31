@@ -37,7 +37,8 @@ pub struct LocalStore(Connection);
 #[serde(default)]
 pub struct AppPreferences {
 	pub window_geometry: Option<WindowGeometry>,
-	/// `None` follows the operating-system locale; otherwise this is a bounded BCP 47 tag.
+	/// `None` explicitly follows the operating-system locale; new preferences use English.
+	/// Otherwise this is a bounded BCP 47 tag.
 	pub language: Option<String>,
 	pub notifications_enabled: bool,
 	pub auto_update: bool,
@@ -94,7 +95,7 @@ impl Default for AppPreferences {
 	fn default() -> Self {
 		Self {
 			window_geometry: None,
-			language: None,
+			language: Some("en-US".into()),
 			notifications_enabled: true,
 			auto_update: false,
 			update_nightly: true,
@@ -2168,6 +2169,11 @@ mod tests {
 			serde_json::from_str(r#"{"voice_noise_suppression":true}"#).unwrap();
 		assert!(legacy.voice_processing.is_none());
 		assert!(legacy.voice_noise_suppression);
+		// A missing language adopts the fork default, but explicit System survives migration.
+		let system: AppPreferences = serde_json::from_str(r#"{"language":null}"#).unwrap();
+		assert_ne!(legacy.language, system.language);
+		store.save_app_preferences(&system).unwrap();
+		assert!(store.app_preferences().unwrap().language.is_none());
 		// Existing serialized bindings omit the newly optional diagnostics shortcut.
 		let mut old_bindings = serde_json::to_value(model::Keybinds::default()).unwrap();
 		old_bindings

@@ -1,4 +1,11 @@
-# Serein
+# Serein — surf1k fork
+
+This is [surf1k/Serein](https://github.com/surf1k/Serein), a fork of
+[ViceVerse-cz/Serein](https://github.com/ViceVerse-cz/Serein): a native Rust desktop
+client for your existing Discord account, servers, channels and conversations.
+See [fork details](docs/FORK.md) for the source revision, English default and verification status.
+Download links and installation repositories below belong to **upstream**, unless explicitly
+marked otherwise; this fork does not yet publish its own installers.
 
 <p align="center">
   <a href="https://github.com/ViceVerse-cz/Serein">
