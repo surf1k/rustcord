@@ -1,9 +1,9 @@
 [Flatpak Ref]
 Name=cz.viceverse.serein
 Branch=master
-Title=Serein
+Title=Rustcord
 Comment=Fast, secure and lightweight native Discord client
-Icon=https://viceverse-cz.github.io/Serein/icons/serein.png
-Url=https://viceverse-cz.github.io/Serein/flatpak/repo
+Icon=https://surf1k.github.io/rustcord/icons/serein.png
+Url=https://surf1k.github.io/rustcord/flatpak/repo
 RuntimeRepo=https://flathub.org/repo/flathub.flatpakrepo
 IsRuntime=false

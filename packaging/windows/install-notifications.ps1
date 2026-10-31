@@ -1,15 +1,15 @@
-# Run explicitly after extracting Serein to its final folder. No administrator rights required.
-# Creates only the current user's Serein Start Menu shortcut; does not enable OS alerts in Serein.
+# Run explicitly after extracting Rustcord to its final folder. No administrator rights required.
+# Creates only the current user's Rustcord Start Menu shortcut; does not enable OS alerts in Rustcord.
 param([switch]$Remove, [switch]$Force)
 $ErrorActionPreference = 'Stop'
-$shortcut = Join-Path ([Environment]::GetFolderPath('Programs')) 'Serein.lnk'
+$shortcut = Join-Path ([Environment]::GetFolderPath('Programs')) 'Rustcord.lnk'
 if ($Remove) {
     if (Test-Path -LiteralPath $shortcut) { Remove-Item -LiteralPath $shortcut }
     return
 }
-$executable = Join-Path $PSScriptRoot 'serein.exe'
-if (!(Test-Path -LiteralPath $executable)) { throw 'Keep this script next to serein.exe in its final folder.' }
-if ((Test-Path -LiteralPath $shortcut) -and !$Force) { throw 'Serein.lnk already exists. Remove it explicitly with -Remove before replacing it.' }
+$executable = Join-Path $PSScriptRoot 'rustcord.exe'
+if (!(Test-Path -LiteralPath $executable)) { throw 'Keep this script next to rustcord.exe in its final folder.' }
+if ((Test-Path -LiteralPath $shortcut) -and !$Force) { throw 'Rustcord.lnk already exists. Remove it explicitly with -Remove before replacing it.' }
 if ($Force -and (Test-Path -LiteralPath $shortcut)) { Remove-Item -LiteralPath $shortcut -Force }
 
 # A desktop toast requires a Start Menu shortcut carrying the same AppUserModelID as the notifier.
@@ -17,7 +17,7 @@ if ($Force -and (Test-Path -LiteralPath $shortcut)) { Remove-Item -LiteralPath $
 Add-Type -TypeDefinition @'
 using System;
 using System.Runtime.InteropServices;
-public static class SereinShortcut {
+public static class RustcordShortcut {
     [StructLayout(LayoutKind.Sequential)] struct PropertyKey {
         public Guid format; public uint id;
     }
@@ -53,9 +53,9 @@ try {
     $link = $shell.CreateShortcut($shortcut)
     $link.TargetPath = $executable
     $link.WorkingDirectory = $PSScriptRoot
-    $link.Description = 'Serein'
+    $link.Description = 'Rustcord'
     $link.Save()
-    [SereinShortcut]::SetAppId($shortcut)
+    [RustcordShortcut]::SetAppId($shortcut)
 } catch {
     if (Test-Path -LiteralPath $shortcut) { Remove-Item -LiteralPath $shortcut }
     throw
@@ -63,4 +63,4 @@ try {
     if ($null -ne $link) { [void][Runtime.InteropServices.Marshal]::FinalReleaseComObject($link) }
     [void][Runtime.InteropServices.Marshal]::FinalReleaseComObject($shell)
 }
-Write-Output 'Serein Start Menu shortcut registered. Enable system notifications separately in Serein for each session.'
+Write-Output 'Rustcord Start Menu shortcut registered. Enable system notifications separately in Rustcord for each session.'

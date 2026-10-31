@@ -1,3 +1,5 @@
+> These source packaging instructions target the Rustcord fork. Existing upstream download and repository URLs below still provide upstream Serein builds, not a Rustcord release.
+
 # Linux AppImage
 
 Download `serein-<version>-Linux-X64.AppImage` from
@@ -9,7 +11,7 @@ chmod +x ./serein-<version>-Linux-X64.AppImage
 ./serein-<version>-Linux-X64.AppImage
 ```
 
-The x86_64 image contains Serein including voice, its desktop entry, icon and
+The x86_64 image contains Rustcord including voice, its desktop entry, icon and
 application licenses. It uses **host runtime libraries**, including GTK4 and
 WebKitGTK 6.0; it is not a self-contained distribution of those libraries. Release
 builds use Ubuntu 24.04 (glibc 2.39), so systems with an older glibc or incompatible
@@ -30,7 +32,7 @@ sudo apt install libgtk-4-1 libwebkitgtk-6.0-4 libasound2t64 libfontconfig1 \
 ```
 
 The WebKitGTK package supplies its matching browser subprocesses, data files and
-GTK dependencies. Serein does not relocate or patch WebKit, disable its sandbox,
+GTK dependencies. Rustcord does not relocate or patch WebKit, disable its sandbox,
 or override the host library search path. A graphical session, graphics driver,
 portal backend and unlocked Secret Service provider are still required. A KDE
 portal/keyring provider can replace the GNOME choices above. No library or desktop
@@ -49,7 +51,7 @@ AppImage filename. Both the file and its directory must be writable, and the
 filesystem must support hard links for the rollback copy (for example ext4 or
 Btrfs; FAT/exFAT require manual replacement). An extracted
 `squashfs-root/AppRun` and native/Flatpak installations use manual or package-manager
-updates. Keep the outer AppImage file in place while Serein is running.
+updates. Keep the outer AppImage file in place while Rustcord is running.
 
 New AppImages embed the standard `gh-releases-zsync` update information and ship
 with a matching `.AppImage.zsync` release asset. Compatible tools such as
@@ -57,7 +59,7 @@ with a matching `.AppImage.zsync` release asset. Compatible tools such as
 unchanged blocks from your existing image, reducing update downloads. Production
 images track `latest`; prerelease images track `latest-pre`. This follows the
 [AppImage update specification](https://github.com/AppImage/AppImageSpec/blob/master/draft.md#github-releases).
-Serein's Settings → Updates also reuses local blocks when the selected release has
+Rustcord's Settings → Updates also reuses local blocks when the selected release has
 a verified `.zsync` asset. It uses the selected Production/Nightly channel and
 checks the reconstructed image against the release SHA-256 before staging it.
 Missing or incompatible metadata, unsupported HTTP ranges, or failed reconstruction
@@ -82,7 +84,7 @@ and [Type 2 runtime 20251108](https://github.com/AppImage/type2-runtime/releases
 verifying each against its pinned SHA-256 before use. The packager reuses the native
 payload allowlist, rejects unresolved host libraries, verifies the output's Type 2
 x86_64 header, and extracts it to compare packaged file contents and executable
-permissions. It never starts Serein or opens a session. Packages over the updater's
+permissions. It never starts Rustcord or opens a session. Packages over the updater's
 512 MiB limit fail the build. Runtime sources and build instructions are available
 at the pinned runtime release; its license and third-party notices are included.
 The runtime statically links third-party components including LGPL libfuse; its

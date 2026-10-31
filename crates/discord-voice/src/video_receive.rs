@@ -24,7 +24,7 @@ const QUEUE_BYTES: usize = 16 * 1024 * 1024;
 const MAX_WIDTH: u32 = 1920;
 const MAX_PIXELS: u64 = 1920 * 1080;
 const START_CODE: [u8; 4] = [0, 0, 0, 1];
-const MAX_DECODE_AGE: Duration = Duration::from_millis(150);
+const MAX_DECODE_AGE: Duration = Duration::from_millis(1500);
 
 /// One decoded remote picture in the decoder's native layout (NV12 or I420 on every
 /// current backend); the renderer converts colour.

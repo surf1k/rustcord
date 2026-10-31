@@ -39,7 +39,7 @@ jobs:
           cache-on-failure: true
           save-if: ${{ github.ref == 'refs/heads/main' }}
       - name: Check production build without development fixtures
-        run: cargo check --locked -p serein --bin serein --no-default-features
+        run: cargo check --locked -p serein --bin rustcord --no-default-features
       - run: cargo xtask check
       - parallel:
           - name: Flatpak encoding after GTK initialization (synthetic)

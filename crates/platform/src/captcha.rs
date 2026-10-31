@@ -272,7 +272,7 @@ mod tests {
 					event_loop
 						.create_window(
 							Window::default_attributes()
-								.with_title("Serein — offline verification smoke")
+								.with_title("Rustcord — offline verification smoke")
 								.with_inner_size(winit::dpi::PhysicalSize::new(500, 400)),
 						)
 						.expect("test window"),

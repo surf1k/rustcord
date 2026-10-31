@@ -2623,7 +2623,8 @@ impl TimelineView {
 				(offset.unwrap_or(self.scroll_offset) - autoscroll_delta).clamp(0.0, max_offset);
 			offset = Some(next);
 			if next != self.scroll_offset {
-				ui.ctx().request_repaint();
+				ui.ctx()
+					.request_repaint_after(crate::scroll::REPAINT_INTERVAL);
 			}
 		}
 		if let Some(offset) = offset {

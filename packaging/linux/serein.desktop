@@ -1,9 +1,10 @@
 [Desktop Entry]
 Type=Application
-Name=Serein
-Comment=Experimental unofficial native Discord client
-Exec=serein
-Icon=serein
-StartupWMClass=cz.viceverse.serein
+Name=Rustcord
+Comment=Native Discord client in Rust
+Exec=rustcord
+Icon=rustcord
+StartupWMClass=rustcord
 Terminal=false
-Categories=Network;InstantMessaging;
+Categories=Network;InstantMessaging;Chat;
+Keywords=discord;chat;voice;rust;rustcord;

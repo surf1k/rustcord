@@ -1,3 +1,5 @@
+> These source packaging instructions target the Rustcord fork. Existing upstream download and repository URLs below still provide upstream Serein builds, not a Rustcord release.
+
 # Linux packages
 
 Release builds target native packages for Ubuntu 26.04 (`apt`, x86_64 and ARM64), Fedora 43/44 (`dnf`),
@@ -22,7 +24,7 @@ Use a directory containing only the selected package. Local build artifacts are
 unsigned; package-manager signature policy may require an operator-signed package.
 The [signed repository setup](../repositories/README.md) prepares apt, dnf/zypper
 and pacman repositories for normal package-manager upgrades. Hosting and signing
-credentials must be configured before those repository URLs are usable. Serein is
+credentials must be configured before those repository URLs are usable. Rustcord is
 not listed in distribution archives or Flathub by this change. An optional
 [AUR binary recipe](../aur/README.md) is prepared in this repository for maintainer
 submission; it does not configure a pacman repository or claim AUR publication.
@@ -38,10 +40,10 @@ these are native package dependencies (`gstreamer1.0-pipewire` on Debian/Ubuntu,
 `pipewire-gstreamer` on Fedora, `gstreamer-plugin-pipewire` on openSUSE and
 `gst-plugin-pipewire` on Arch). Use a ScreenCast-capable portal backend matching your
 desktop; the GTK fallback alone does not provide screen capture. VA-API/NVENC and OpenGL
-plugins plus compatible drivers enable hardware encoding; otherwise Serein uses bundled
+plugins plus compatible drivers enable hardware encoding; otherwise Rustcord uses bundled
 OpenH264. Hardware plugin names/availability vary by distribution and repository.
 Stream audio additionally links the system `libpulse` client library and uses individual
-application monitors on PulseAudio or PipeWire-Pulse. Serein's playback is excluded;
+application monitors on PulseAudio or PipeWire-Pulse. Rustcord's playback is excluded;
 no virtual device or output rerouting is required. Native package tools derive the
 linked libpulse runtime dependency from the executable. Source builds require its
 development package, installed by `install-build-deps.sh`.
@@ -76,7 +78,7 @@ Tumbleweed it refreshes repository metadata and runs `zypper dist-upgrade` with
 explicit downgrade permission before installing dependencies, so the rolling
 container and repository packages use consistent versions. This can downgrade
 packages in the disposable builder when its image is ahead of the mirror. Normal
-packaging runs without root and never installs or starts Serein. RPM uses
+packaging runs without root and never installs or starts Rustcord. RPM uses
 `rpmbuild` dependency generation; Arch derives native library package dependencies
 from the host package database and uses `makepkg`. Both inspect package metadata,
 payload contents/permissions and the native executable's library closure. Runtime
@@ -90,7 +92,7 @@ python3 packaging/linux/test_package.py --format rpm
 python3 packaging/linux/test_package.py --format arch
 ```
 
-These package `/bin/true`, never Serein or a live account. Native application
+These package `/bin/true`, never Rustcord or a live account. Native application
 builds and package inspection do not prove desktop login, graphics or physical audio.
 
 ## Debian / Ubuntu details
@@ -111,7 +113,7 @@ and source trees are not included. It excludes stale archives, nested voice outp
 logs, and stale license files. Temporary files are removed when packaging finishes
 or raises an error.
 
-The archive installs `/usr/bin/serein`, a launcher in
+The archive installs `/usr/bin/rustcord`, a launcher in
 `/usr/share/applications/cz.viceverse.serein.desktop`, and notices and licenses under
 `/usr/share/doc/serein`. No maintainer
 scripts, background updater, automatic launch or user-profile writes are added.
@@ -154,7 +156,7 @@ PYTHONDONTWRITEBYTECODE=1 python3 packaging/linux/test_package.py
 
 It deliberately supplies synthetic documentation and source trees, verifies they are
 omitted, then checks mismatched payload and invalid ELF detection. The fixture is not
-a Serein build.
+a Rustcord build.
 
 Tool contracts: [dpkg-shlibdeps](https://manpages.debian.org/trixie/dpkg-dev/dpkg-shlibdeps.1.en.html)
 and [dpkg-deb](https://manpages.debian.org/trixie/dpkg/dpkg-deb.1.en.html).

@@ -927,7 +927,7 @@ impl MessagingUi {
 								0
 							};
 							let enabled = visible && (channel.supports_text() || forum);
-							// Kinds Serein cannot render keep Discord's own destination.
+							// Kinds Rustcord cannot render keep Discord's own destination.
 							let external = (!channel.supports_text() && !forum)
 								.then(|| crate::markdown::discord_url(channel, None))
 								.flatten()

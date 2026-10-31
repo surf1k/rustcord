@@ -28,7 +28,8 @@
                 ...
             }: {
                 packages.serein = pkgs.callPackage ./packaging/nix/package.nix {};
-                packages.default = config.packages.serein;
+                packages.rustcord = config.packages.serein;
+                packages.default = config.packages.rustcord;
 
                 devShells.default = pkgs.mkShell {
                     name = "serein-dev";

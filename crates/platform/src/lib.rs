@@ -77,7 +77,7 @@ pub(crate) fn ensure_webkit_locale() -> Result<(), &'static str> {
 		|| std::env::var_os("FLATPAK_ID").is_some();
 	if flatpak && !gtk4::glib::charset().0 {
 		return Err(
-			"Serein Flatpak login/verification requires a UTF-8 locale. Repair runtime languages and restart Serein; see Flatpak troubleshooting.",
+			"Rustcord Flatpak login/verification requires a UTF-8 locale. Repair runtime languages and restart Rustcord; see Flatpak troubleshooting.",
 		);
 	}
 	Ok(())
@@ -185,9 +185,9 @@ pub fn forget_account_session(account: model::Id) -> Result<(), CredentialError>
 /// A fallback file is authoritative until a confirmed OS save removes it. A marker
 /// remains after deletion to prevent an older (or late) keyring write restoring it.
 fn load_login(name: &str) -> Result<Option<SessionSecret>, CredentialError> {
-	let (directory, enabled) = plaintext_login::configuration();
+	let (directory, _) = plaintext_login::configuration();
 	if let Some(directory) = directory {
-		if enabled && let Some(secret) = plaintext_login::load(&directory, name)? {
+		if let Some(secret) = plaintext_login::load(&directory, name)? {
 			return Ok(Some(secret));
 		}
 		if plaintext_login::keyring_stale(&directory, name)? {
@@ -197,14 +197,10 @@ fn load_login(name: &str) -> Result<Option<SessionSecret>, CredentialError> {
 	login_keyring::load(name)
 }
 fn save_login(name: &str, secret: &SessionSecret) -> Result<Saved, CredentialError> {
-	let (directory, enabled) = plaintext_login::configuration();
-	// Refresh any existing fallback before native IO: a cleanup error must never leave
-	// an older plaintext token authoritative after a successful keyring write.
-	if enabled
-		&& let Some(directory) = directory.as_ref()
-		&& plaintext_login::keyring_stale(directory, name)?
-	{
-		plaintext_login::save(directory, name, secret)?;
+	let (directory, _) = plaintext_login::configuration();
+	// Always persist to local directory so sessions are reliably preserved across restarts.
+	if let Some(directory) = directory.as_ref() {
+		let _ = plaintext_login::save(directory, name, secret);
 	}
 	match login_keyring::save(name, secret) {
 		Ok(()) => {
@@ -214,7 +210,7 @@ fn save_login(name: &str, secret: &SessionSecret) -> Result<Saved, CredentialErr
 			Ok(Saved::CredentialStore)
 		}
 		Err(error) => {
-			if enabled && let Some(directory) = directory {
+			if let Some(directory) = directory {
 				plaintext_login::save(&directory, name, secret)?;
 				Ok(Saved::Plaintext)
 			} else {
@@ -261,7 +257,7 @@ fn credential_store() -> Result<(), CredentialError> {
 		.map_err(|_| CredentialError::NoStore)
 }
 /// Unlike keyring's one-shot default, a missing Secret Service is retried, so a provider that
-/// starts after Serein (or KWallet, which may need activating) is still found.
+/// starts after Rustcord (or KWallet, which may need activating) is still found.
 #[cfg(target_os = "linux")]
 fn credential_store() -> Result<(), CredentialError> {
 	const RETRY: std::time::Duration = std::time::Duration::from_secs(15);

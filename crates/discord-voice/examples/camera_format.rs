@@ -1,5 +1,5 @@
 //! Offline capture-selection debug check; never opens a camera.
-use discord_voice::camera::{HEIGHT, WIDTH};
+use discord_voice::camera::{HEIGHT, WIDTH, FPS};
 #[path = "../src/camera/format.rs"]
 mod format;
 
@@ -16,8 +16,8 @@ fn main() {
 		.min_by_key(|(rank, _)| *rank)
 		.unwrap()
 		.1;
-	assert_eq!(selected, (WIDTH, HEIGHT, 15.0));
-	assert!(format::rank(800, 600, 15.0) < format::rank(320, 240, 15.0));
+	assert_eq!(selected, (WIDTH, HEIGHT, 30.0));
+	assert!(format::rank(800, 600, 30.0) < format::rank(320, 240, 30.0));
 	for (width, height) in [
 		(0, 480),
 		(640, 0),
@@ -25,9 +25,9 @@ fn main() {
 		(1280, 721),
 		(usize::MAX, 480),
 	] {
-		assert!(format::rank(width, height, 15.0).is_none());
+		assert!(format::rank(width, height, 30.0).is_none());
 	}
-	assert!(format::rank(1280, 720, 15.0).is_some());
+	assert!(format::rank(1280, 720, 30.0).is_some());
 	assert_eq!(format::nearest_fps(5.0, 30.0), Some(15.0));
 	assert_eq!(format::nearest_fps(24.0, 60.0), Some(24.0));
 	assert_eq!(format::nearest_fps(1.0, 10.0), Some(10.0));

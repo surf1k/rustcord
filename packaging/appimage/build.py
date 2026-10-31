@@ -22,8 +22,8 @@ def update_metadata(version, release_tag):
         raise ValueError("AppImage release tag must match the application version")
     name = f"serein-{release_tag or version}-Linux-X64.AppImage"
     channel = "latest-pre" if "-" in version.split("+", 1)[0] else "latest"
-    information = f"gh-releases-zsync|ViceVerse-cz|Serein|{channel}|serein-*-Linux-X64.AppImage.zsync"
-    url = f"https://github.com/ViceVerse-cz/Serein/releases/download/v{version}/serein-v{version}-Linux-X64.AppImage"
+    information = f"gh-releases-zsync|surf1k|rustcord|{channel}|serein-*-Linux-X64.AppImage.zsync"
+    url = f"https://github.com/surf1k/rustcord/releases/download/v{version}/serein-v{version}-Linux-X64.AppImage"
     return name, information, url
 
 
@@ -41,7 +41,7 @@ def build(root, version):
         raise ValueError("The 'file' command is required by appimagetool but was not found in PATH")
     if not shutil.which("zsyncmake"):
         raise ValueError("Install zsync to generate AppImage delta-update metadata")
-    libraries = subprocess.check_output(["ldd", str(root / "serein")], text=True)
+    libraries = subprocess.check_output(["ldd", str(root / "rustcord")], text=True)
     if "not found" in libraries:
         raise ValueError(f"Missing host runtime libraries:\n{libraries}")
     with tempfile.TemporaryDirectory(prefix="serein-appimage-") as directory:
@@ -86,7 +86,7 @@ def build(root, version):
                 target = extracted / source.relative_to(appdir)
                 if not target.is_file() or not filecmp.cmp(source, target, shallow=False):
                     raise ValueError(f"AppImage changed payload: {source.relative_to(appdir)}")
-        for name in ["AppRun", "usr/bin/serein"]:
+        for name in ["AppRun", "usr/bin/rustcord"]:
             if not os.access(extracted / name, os.X_OK):
                 raise ValueError(f"AppImage lost executable permission: {name}")
         destination = root / candidate.name

@@ -11,7 +11,7 @@ gpg --batch --passphrase '' --quick-generate-key \
 key=$(gpg --with-colons --list-secret-keys | awk -F: '$1 == "fpr" {print $10; exit}')
 arch=$(dpkg --print-architecture)
 mkdir -p "$work/pkg/DEBIAN" "$work/pkg/usr/bin" "$work/input"
-cp /bin/true "$work/pkg/usr/bin/serein"
+cp /bin/true "$work/pkg/usr/bin/rustcord"
 printf 'Package: serein\nVersion: 0.1.0-1\nArchitecture: %s\nMaintainer: Test <test@example.invalid>\nDescription: synthetic test\n' \
   "$arch" > "$work/pkg/DEBIAN/control"
 dpkg-deb --build "$work/pkg" "$work/input/serein.deb"

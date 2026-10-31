@@ -298,7 +298,7 @@ impl MessagingUi {
 				);
 				crate::icons::paint(
 					ui.painter(),
-					crate::icons::Icon::Serein,
+					crate::icons::Icon::Rustcord,
 					rect.shrink(9.0),
 					colors.text.lerp_to_gamma(colors.accent_text, lit),
 				);
@@ -327,6 +327,38 @@ impl MessagingUi {
 						commands.push(command);
 					}
 					self.search.open = false;
+				}
+				// Keep the global read action discoverable without requiring a home-tile context menu.
+				let read_label = self
+					.language
+					.text("server-menu-all-read-item-mark-all-as-read");
+				let mark = ui
+					.add_enabled_ui(state.can_mark_all_read(), |ui| {
+						let (rect, response) = ui
+							.allocate_exact_size(egui::vec2(RAIL_TILE, 28.0), egui::Sense::click());
+						if response.hovered() || response.has_focus() {
+							ui.painter().rect_filled(rect, 6, colors.raised);
+						}
+						crate::icons::paint(
+							ui.painter(),
+							crate::icons::Icon::Check,
+							egui::Rect::from_center_size(rect.center(), egui::Vec2::splat(18.0)),
+							colors.muted,
+						);
+						response.widget_info(|| {
+							egui::WidgetInfo::labeled(
+								egui::Role::Button,
+								ui.is_enabled(),
+								&read_label,
+							)
+						});
+						response
+					})
+					.inner
+					.on_hover_text(&read_label)
+					.on_disabled_hover_text(&read_label);
+				if mark.clicked() {
+					self.server_menu.mark_all_read_requested = true;
 				}
 				self.scroll
 					.attach(

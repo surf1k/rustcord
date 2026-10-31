@@ -3,7 +3,7 @@
 language-system = Sistem
 language-group = Dil
 language-label = Ekran dili
-language-description = Serein'in dilini seçin. Discord içeriği asla çevrilmez.
+language-description = Rustcord'in dilini seçin. Discord içeriği asla çevrilmez.
 section-user = Kullanıcı ayarları
 section-app = Uygulama ayarları
 section-customization = Özelleştirme
@@ -28,11 +28,11 @@ description-appearance = Tema, renkler, pencere efektleri ve düzen.
 description-chat = Mesajların, medyanın, bağlantıların ve kaydırmanın nasıl davrandığı.
 description-messaging-permissions = Sizinle kimlerin iletişim kurabileceğini ve mesajların nasıl filtreleneceğini kontrol edin.
 description-notifications = Hangi bildirimleri alacağınızı ve bunların nasıl görüneceğini seçin.
-description-registered-games = Ne oynadığınızı paylaşın, Serein'in algıladığı oyunları düzeltin veya ekleyin.
+description-registered-games = Ne oynadığınızı paylaşın, Rustcord'in algıladığı oyunları düzeltin veya ekleyin.
 description-voice = Mikrofon, hoparlörler, kamera ve ses işleme.
-description-keybinds = Serein için klavye kısayolları.
-description-storage = Serein'in bu cihazda sakladıkları.
-description-updates = Bu cihazda Serein'i güncel tutun.
+description-keybinds = Rustcord için klavye kısayolları.
+description-storage = Rustcord'in bu cihazda sakladıkları.
+description-updates = Bu cihazda Rustcord'i güncel tutun.
 description-extensions = Topluluk eklentilerini yönetin.
 description-themes = Bir topluluk teması seçin.
 theme-maker = Tema oluşturucu
@@ -45,30 +45,30 @@ log-out = Oturumu kapat
 unofficial = Resmi değil · Discord tarafından onaylanmadı
 offline-preview = Çevrimdışı önizleme · değişiklikler bu oturumda kalır ve hiçbir zaman gönderilmez.
 general-startup = Başlatmak
-general-open-at-startup = Bilgisayarınız başladığında Serein'i açın
-general-open-at-startup-description = Serein arka planda oturum açar ve bağlantı kurar.
+general-open-at-startup = Bilgisayarınız başladığında Rustcord'i açın
+general-open-at-startup-description = Rustcord arka planda oturum açar ve bağlantı kurar.
 general-start-minimized = Küçültülmüş başlangıç
 general-start-minimized-description = Arka planda başlayın, yolunuzdan çekilin.
 general-startup-unavailable = Otomatik başlatma Windows ve macOS'ta mevcuttur.
 general-window = Pencere
 general-hide-decorations = Pencere dekorasyonlarını gizle
-general-hide-decorations-description = Sistem başlık çubuğunu ve kenarlıklarını kaldırın. Serein'i taşımak, yeniden boyutlandırmak veya kapatmak için pencere yöneticinizi kullanın.
-general-hide-title-bar = Serein başlık çubuğunu gizle
+general-hide-decorations-description = Sistem başlık çubuğunu ve kenarlıklarını kaldırın. Rustcord'i taşımak, yeniden boyutlandırmak veya kapatmak için pencere yöneticinizi kullanın.
+general-hide-title-bar = Rustcord başlık çubuğunu gizle
 general-hide-title-bar-description = Bunun yerine sistem başlık çubuğunu ve pencere düğmelerini kullanın.
-general-keep-menu-bar = Serein'i menü çubuğunda tutun
-general-keep-system-tray = Serein'i sistem tepsisinde tutun
-general-menu-bar-description = Pencereyi kapatmak Serein'i menü çubuğunda tutar. Çıkmak için menüsünden çıkın.
-general-linux-tray-description = Kapanış Serein'in çalışmasını sağlar. Göstermek, simge durumuna küçültmek veya çıkmak için tepsiyi kullanın.
-general-windows-tray-description = Pencereyi kapatmak Serein'i bildirim alanında tutar. Çıkmak için menüsünden çıkın.
+general-keep-menu-bar = Rustcord'i menü çubuğunda tutun
+general-keep-system-tray = Rustcord'i sistem tepsisinde tutun
+general-menu-bar-description = Pencereyi kapatmak Rustcord'i menü çubuğunda tutar. Çıkmak için menüsünden çıkın.
+general-linux-tray-description = Kapanış Rustcord'in çalışmasını sağlar. Göstermek, simge durumuna küçültmek veya çıkmak için tepsiyi kullanın.
+general-windows-tray-description = Pencereyi kapatmak Rustcord'i bildirim alanında tutar. Çıkmak için menüsünden çıkın.
 general-tray-unavailable = Tepsi bu platformda kullanılamıyor.
 general-graphics = Grafik
 general-render-with = Şununla oluştur:
-general-gpu-restart = Serein'in bir sonraki başlangıcında etkili olur.
+general-gpu-restart = Rustcord'in bir sonraki başlangıcında etkili olur.
 general-gpu-current-prefix = Şu anda çizim yapıyorum
 gpu-automatic = Otomatik
 gpu-high-performance = Yüksek performans
 gpu-power-saving = Güç tasarrufu
-gpu-automatic-description = Bu pencereyi çizebilecek GPU'yu Serein seçsin.
+gpu-automatic-description = Bu pencereyi çizebilecek GPU'yu Rustcord seçsin.
 gpu-high-performance-description = Mevcut olduğunda ayrı grafik kartını kullanın.
 gpu-power-saving-description = Pilden tasarruf etmek için entegre grafikleri kullanın.
 direct-messages = Doğrudan Mesajlar
@@ -214,7 +214,7 @@ account-menu-custom-status-editor-clear-after = Şu tarihten sonra temizle:
 # Context: custom_status_editor
 account-menu-custom-status-editor-no-custom-status = Özel durum yok
 # Context: custom_status_editor
-account-menu-custom-status-editor-serein-clears-it = Serein temizliyor
+account-menu-custom-status-editor-serein-clears-it = Rustcord temizliyor
 # Context: custom_status_editor
 account-menu-custom-status-editor-status-text = Durum metni
 # Context: custom_status_editor
@@ -1546,7 +1546,7 @@ keybinds-show-voice-enable-global-keybinds = Genel tuş bağlantılarını etkin
 # Context: show_voice
 keybinds-show-voice-global-availability = Küresel kullanılabilirlik
 # Context: show_voice
-keybinds-show-voice-use-voice-shortcuts-while-another-app-is-focused-when-off = Başka bir uygulamaya odaklanırken ses kısayollarını kullanın. Kapalıyken kısayollar yalnızca Serein odaklandığında çalışır.
+keybinds-show-voice-use-voice-shortcuts-while-another-app-is-focused-when-off = Başka bir uygulamaya odaklanırken ses kısayollarını kullanın. Kapalıyken kısayollar yalnızca Rustcord odaklandığında çalışır.
 
 ## crates/ui/src/lib.rs
 # Context: account_card
@@ -1636,11 +1636,11 @@ main-sign-in-consent-i-own-this-account-and-authorize-this-session = Bu hesabın
 # Context: sign_in_consent
 main-sign-in-consent-passwords-and-2fa-stay-on-discord-s-own-login-page = Şifreler ve 2FA, Discord'un kendi giriş sayfasında kalır; İşletim sisteminizin kimlik bilgileri deposunda yalnızca oturum belirteci tutulur.
 # Context: sign_in_disclosures
-main-sign-in-disclosures-about-serein = Serein hakkında
+main-sign-in-disclosures-about-serein = Rustcord hakkında
 # Context: sign_in_disclosures
 main-sign-in-disclosures-connect-with-this-token = Bu jetonla bağlanın
 # Context: sign_in_disclosures
-main-sign-in-disclosures-for-owners-who-already-hold-a-valid-discord-session-token = Halihazırda geçerli bir Discord oturum jetonuna sahip olan sahipler için (örneğin oturum açılmış başka bir Serein kurulumundan). Şifreler ve 2FA burada asla kullanılmaz; bu, Discord'un barındırılan giriş sayfasını tamamen atlar.
+main-sign-in-disclosures-for-owners-who-already-hold-a-valid-discord-session-token = Halihazırda geçerli bir Discord oturum jetonuna sahip olan sahipler için (örneğin oturum açılmış başka bir Rustcord kurulumundan). Şifreler ve 2FA burada asla kullanılmaz; bu, Discord'un barındırılan giriş sayfasını tamamen atlar.
 # Context: sign_in_disclosures
 main-sign-in-disclosures-forget-saved-login = Kayıtlı girişi unut
 # Context: sign_in_disclosures
@@ -1654,7 +1654,7 @@ main-sign-in-header-sign-in-with-your-discord-account-to-get-started = Başlamak
 # Context: sign_in_header
 main-sign-in-header-welcome-back = tekrar hoşgeldiniz
 # Context: sign_in_header
-main-sign-in-header-welcome-to-serein = Serein'e hoş geldiniz
+main-sign-in-header-welcome-to-serein = Rustcord'e hoş geldiniz
 # Context: sign_in_preview
 main-sign-in-status-copy-failure-details = Hata ayrıntılarını kopyala
 main-sign-in-preview-explore-the-offline-preview = Çevrimdışı önizlemeyi keşfedin
@@ -2250,9 +2250,9 @@ screen-body-refresh = Yenile
 # Context: body
 screen-body-screen-or-window = Ekran veya pencere
 # Context: body
-screen-body-send-what-your-mac-plays-along-with-the-screen-serein = Mac'inizin oynattıklarını ekranla birlikte gönderin. Serein'in kendi çağrı sesi dışarıda bırakıldı.
+screen-body-send-what-your-mac-plays-along-with-the-screen-serein = Mac'inizin oynattıklarını ekranla birlikte gönderin. Rustcord'in kendi çağrı sesi dışarıda bırakıldı.
 # Context: body
-screen-body-share-sound-from-other-apps-even-when-sharing-one-window = Bir pencereyi paylaşırken bile diğer uygulamalardaki sesi paylaşın. Serein'in kendi sesi dışarıda bırakıldı.
+screen-body-share-sound-from-other-apps-even-when-sharing-one-window = Bir pencereyi paylaşırken bile diğer uygulamalardaki sesi paylaşın. Rustcord'in kendi sesi dışarıda bırakıldı.
 # Context: body
 screen-body-share-system-audio = Sistem sesini paylaş
 # Context: body
@@ -3413,7 +3413,7 @@ settings-activity-added-games = Eklenen Oyunlar
 # Context: activity_settings
 settings-activity-no-games-added = Eklenmiş oyun yok
 # Context: activity_settings
-settings-activity-hidden = Gizlendi. Serein bu oyunu algılamayacak.
+settings-activity-hidden = Gizlendi. Rustcord bu oyunu algılamayacak.
 # Context: activity_settings
 settings-activity-detected = Otomatik algılandı
 # Context: activity_settings
@@ -3435,7 +3435,7 @@ settings-activity-click-to-rename = Yeniden adlandırmak için tıklayın
 # Context: activity_settings
 settings-activity-add-a-game = Oyun ekle
 # Context: activity_settings
-settings-activity-choose-program = Çalışan bir program seçin. Serein, çalıştığı her zaman onu oyununuz olarak gösterir.
+settings-activity-choose-program = Çalışan bir program seçin. Rustcord, çalıştığı her zaman onu oyununuz olarak gösterir.
 # Context: activity_settings
 settings-activity-search-programs = Çalışan programlarda ara
 # Context: activity_settings
@@ -3463,7 +3463,7 @@ settings-appearance-settings-primary-color = Ana renk
 # Context: appearance_settings
 settings-appearance-settings-reset = Sıfırla
 # Context: appearance_settings
-settings-appearance-settings-restart-serein-after-changing-this-themes-can-customize-effects-while = Bunu değiştirdikten sonra Serein'i yeniden başlatın. Temalar etkinleştirildiğinde efektleri özelleştirebilir.
+settings-appearance-settings-restart-serein-after-changing-this-themes-can-customize-effects-while = Bunu değiştirdikten sonra Rustcord'i yeniden başlatın. Temalar etkinleştirildiğinde efektleri özelleştirebilir.
 # Context: appearance_settings
 settings-appearance-settings-the-active-theme-brings-its-own-accent-it-takes-over = Aktif tema kendi aksanını da beraberinde getiriyor; tema kullanımdayken görevi devralır.
 # Context: appearance_settings
@@ -3500,11 +3500,11 @@ settings-storage-page-clear-cache = Önbelleği temizle
 # Context: storage_page
 settings-storage-page-local-storage = Yerel depolama
 # Context: storage_page
-settings-storage-page-messages-and-drafts-are-cached-on-this-device-inside-bounded = Mesajlar ve taslaklar bu cihazda sınırlı, hesaptan yalıtılmış dosyalar içinde önbelleğe alınır. Önbellek verileri Serein tarafından şifrelenmez; kaydedilen oturum açma belirteçleri işletim sistemi kimlik bilgileri deposunu kullanır.
+settings-storage-page-messages-and-drafts-are-cached-on-this-device-inside-bounded = Mesajlar ve taslaklar bu cihazda sınırlı, hesaptan yalıtılmış dosyalar içinde önbelleğe alınır. Önbellek verileri Rustcord tarafından şifrelenmez; kaydedilen oturum açma belirteçleri işletim sistemi kimlik bilgileri deposunu kullanır.
 # Context: storage_page
 settings-storage-page-removes-cached-messages-and-media-drafts-and-your-login-stay = Önbelleğe alınmış mesajları ve medyayı kaldırır. Taslaklar ve giriş bilgileriniz.
 # Context: storage_page
-settings-storage-page-serein-does-not-collect-telemetry-or-upload-diagnostics-discord-retains = Serein telemetri toplamaz veya tanılamayı yüklemez. Discord, hizmet tarafındaki verileri kendi politikalarına göre saklar.
+settings-storage-page-serein-does-not-collect-telemetry-or-upload-diagnostics-discord-retains = Rustcord telemetri toplamaz veya tanılamayı yüklemez. Discord, hizmet tarafındaki verileri kendi politikalarına göre saklar.
 # Context: storage_page
 settings-storage-page-your-privacy = Gizliliğiniz
 # Context: cosmetic_settings
@@ -3948,7 +3948,7 @@ updates-update-settings-could-not-load-or-save-update-preferences-changes-may-no
 # Context: update_settings
 updates-update-settings-download-update = Güncellemeyi indir
 # Context: update_settings
-updates-update-settings-download-updates-in-the-background-restart-when-you-are-ready = Güncellemeleri arka planda indirin. Hazır olduğunuzda yeniden başlayın. Serein hala başlangıçta ve bu kapalı olduğunda periyodik olarak kontrol ediyor.
+updates-update-settings-download-updates-in-the-background-restart-when-you-are-ready = Güncellemeleri arka planda indirin. Hazır olduğunuzda yeniden başlayın. Rustcord hala başlangıçta ve bu kapalı olduğunda periyodik olarak kontrol ediyor.
 # Context: update_settings
 updates-update-settings-early-builds-with-the-newest-changes-nightly-releases-can-be = En yeni değişikliklerle erken sürümler. Gecelik sürümler daha az güvenilir olabilir.
 # Context: update_settings
@@ -3974,7 +3974,7 @@ updates-update-settings-release-channel = Yayın kanalı
 # Context: update_settings
 updates-update-settings-restart-to-update = Güncellemek için yeniden başlatın
 # Context: update_settings
-updates-update-settings-serein-was-installed-via-your-distribution-run-this-in-a = Serein dağıtımınız aracılığıyla kuruldu. Güncellemek için bunu bir terminalde çalıştırın.
+updates-update-settings-serein-was-installed-via-your-distribution-run-this-in-a = Rustcord dağıtımınız aracılığıyla kuruldu. Güncellemek için bunu bir terminalde çalıştırın.
 # Context: update_settings
 updates-update-settings-support-diagnostics = Destek ve teşhis
 # Context: update_log
@@ -4429,7 +4429,7 @@ onboarding-rules-heading = Sunucu kuralları
 # Context: rules
 onboarding-rules-review = Sohbet edebilmen için bir moderatör bu yanıtları inceler.
 # Context: field
-onboarding-field-unsupported = Bu sunucu, Serein'in henüz gösteremediği bir soru soruyor. Katılımı Discord uygulamasında tamamla.
+onboarding-field-unsupported = Bu sunucu, Rustcord'in henüz gösteremediği bir soru soruyor. Katılımı Discord uygulamasında tamamla.
 # Context: field
 onboarding-field-agree = Kuralları okudum ve kabul ediyorum
 
@@ -4560,7 +4560,7 @@ reading-double-click-reaction = Double-click reaction
 
 ## crates/platform/src/app_menu.rs
 # Context: macos_menu_bar
-app-menu-about = Serein Hakkında
+app-menu-about = Rustcord Hakkında
 # Context: macos_menu_bar
 app-menu-updates = Güncellemeleri Denetle…
 # Context: macos_menu_bar
@@ -4568,13 +4568,13 @@ app-menu-settings = Ayarlar…
 # Context: macos_menu_bar
 app-menu-services = Servisler
 # Context: macos_menu_bar
-app-menu-hide = Serein'i Gizle
+app-menu-hide = Rustcord'i Gizle
 # Context: macos_menu_bar
 app-menu-hide-others = Diğerlerini Gizle
 # Context: macos_menu_bar
 app-menu-show-all = Tümünü Göster
 # Context: macos_menu_bar
-app-menu-quit = Serein'den Çık
+app-menu-quit = Rustcord'den Çık
 # Context: macos_menu_bar
 app-menu-file = Dosya
 # Context: macos_menu_bar
@@ -4616,7 +4616,7 @@ app-menu-bring-all-to-front = Tümünü Öne Getir
 # Context: macos_menu_bar
 app-menu-help = Yardım
 # Context: macos_menu_bar
-app-menu-github = GitHub'da Serein
+app-menu-github = GitHub'da Rustcord
 # Context: macos_menu_bar
 app-menu-report-issue = Sorun Bildir…
 

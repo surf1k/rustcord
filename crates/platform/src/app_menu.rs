@@ -107,7 +107,7 @@ define_class!(
 	// SAFETY: NSObject has no subclassing requirements. All state and callbacks stay on
 	// the main thread, and the target lives until every menu item is disconnected.
 	#[unsafe(super = NSObject)]
-	#[name = "SereinMenuTarget"]
+	#[name = "RustcordMenuTarget"]
 	#[thread_kind = MainThreadOnly]
 	#[ivars = State]
 	struct Target;

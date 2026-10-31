@@ -22,13 +22,25 @@ pub(super) enum Mode {
 	Software,
 }
 impl Mode {
-	pub(super) const ALL: [Self; 5] = [
-		Self::Va,
-		Self::VaLegacy,
-		Self::Nvidia,
-		Self::NvidiaCopy,
-		Self::Software,
-	];
+	pub(super) fn all() -> Vec<Self> {
+		if gst::ElementFactory::find("nvh264enc").is_some() {
+			vec![
+				Self::Nvidia,
+				Self::NvidiaCopy,
+				Self::Va,
+				Self::VaLegacy,
+				Self::Software,
+			]
+		} else {
+			vec![
+				Self::Va,
+				Self::VaLegacy,
+				Self::Nvidia,
+				Self::NvidiaCopy,
+				Self::Software,
+			]
+		}
+	}
 	pub(super) fn label(self) -> &'static str {
 		match self {
 			Self::Va => "H.264 · VA-API hardware encoding",
@@ -123,7 +135,7 @@ impl Capture {
 				settings.fps * 2
 			),
 			Mode::Nvidia | Mode::NvidiaCopy => format!(
-				"nvh264enc name=encoder rc-mode=cbr bitrate={} gop-size={} bframes=0 rc-lookahead=0 zerolatency=true",
+				"nvh264enc name=encoder rc-mode=cbr bitrate={} gop-size={} bframes=0 rc-lookahead=0 zerolatency=true repeat-sequence-header=true",
 				bitrate / 1000,
 				settings.fps * 2
 			),

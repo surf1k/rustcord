@@ -19,30 +19,29 @@ pub(super) fn x11_session() -> bool {
 		&& std::env::var_os("DISPLAY").is_some_and(|value| !value.is_empty())
 }
 
-fn niri_desktop(desktop: &str) -> bool {
-	desktop
-		.split(':')
-		.any(|name| name.eq_ignore_ascii_case("niri"))
-}
-
-/// Niri 26.04 leaves SPA header PTS at zero, which GstBaseSrc preserves (plus
-/// its startup offset) even with do-timestamp=true. Both videorate branches then
+/// Wayland portal (PipeWire) frames often leave SPA header PTS at zero or unreferenced,
+/// which GstBaseSrc preserves even with do-timestamp=true. Both videorate branches then
 /// discard subsequent pictures. Timestamp at arrival, before either branch.
 /// Only buffer metadata is made writable; pixel memory remains shared.
-pub(super) fn timestamp_niri_frames(source: &gst::Element) -> Result<(), &'static str> {
+pub(super) fn timestamp_portal_frames(source: &gst::Element) -> Result<(), &'static str> {
 	let weak = source.downgrade();
+	let start = Instant::now();
+	let last_pts = Arc::new(AtomicU64::new(0));
 	source
 		.static_pad("src")
 		.ok_or("Screen capture source has no output")?
 		.add_probe(gst::PadProbeType::BUFFER, move |_, info| {
-			if let Some(time) = weak
+			let running_time = weak
 				.upgrade()
 				.and_then(|source| source.current_running_time())
-				&& let Some(gst::PadProbeData::Buffer(buffer)) = &mut info.data
-			{
+				.unwrap_or_else(|| gst::ClockTime::from_nseconds(start.elapsed().as_nanos() as u64));
+			let prev = last_pts.load(Ordering::Relaxed);
+			let pts = running_time.max(gst::ClockTime::from_nseconds(prev.saturating_add(1_000_000)));
+			last_pts.store(pts.nseconds(), Ordering::Relaxed);
+			if let Some(gst::PadProbeData::Buffer(buffer)) = &mut info.data {
 				let buffer = buffer.make_mut();
-				buffer.set_pts(time);
-				buffer.set_dts(time);
+				buffer.set_pts(pts);
+				buffer.set_dts(pts);
 			}
 			gst::PadProbeReturn::Ok
 		});
@@ -122,7 +121,8 @@ pub(super) fn run(
 				})
 				.transpose()?;
 			let mut mode_index = 0;
-			while let Some(&mode) = Mode::ALL.get(mode_index) {
+			let modes = Mode::all();
+			while let Some(&mode) = modes.get(mode_index) {
 				mode_index += 1;
 				if stop.load(Ordering::Acquire) || send.is_closed() {
 					return Ok(());
@@ -149,11 +149,7 @@ pub(super) fn run(
 						source.set_property("path", portal.node_id.to_string());
 					}
 					source.set_property("do-timestamp", true);
-					if std::env::var("XDG_CURRENT_DESKTOP")
-						.is_ok_and(|desktop| niri_desktop(&desktop))
-					{
-						timestamp_niri_frames(&source)?;
-					}
+					timestamp_portal_frames(&source)?;
 					// Damage-driven desktops still need a fresh IDR when a viewer joins an idle screen.
 					source.set_property("keepalive-time", 1000i32);
 					source.set_property("min-buffers", 2i32);

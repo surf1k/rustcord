@@ -20,18 +20,20 @@ mod linux;
 #[cfg(target_os = "windows")]
 mod windows;
 
-pub const WIDTH: usize = 640;
-pub const HEIGHT: usize = 480;
-pub const MAX_ENCODED_BYTES: usize = 128 * 1024;
+pub const WIDTH: usize = 1280;
+pub const HEIGHT: usize = 720;
+pub const FPS: u32 = 30;
+pub const BIT_RATE: u32 = 2_500_000;
+pub const MAX_ENCODED_BYTES: usize = 512 * 1024;
 pub const SUPPORTED: bool = cfg!(any(
 	target_os = "macos",
 	target_os = "windows",
 	target_os = "linux"
 ));
-/// Consecutive empty hardware outputs (two seconds at 15 fps) before falling back to
+/// Consecutive empty hardware outputs (two seconds at the target frame rate) before falling back to
 /// openh264, so a hardware encoder that accepts pictures but never returns them cannot
 /// leave the call without video.
-const HARDWARE_STALL: u8 = 30;
+const HARDWARE_STALL: u8 = (FPS * 2) as u8;
 const FRAME_INTERVAL: Duration = Duration::from_nanos(1_000_000_000 / format::FPS as u64);
 // Includes asynchronous teardown: rapid toggles cannot accumulate camera workers.
 static RUNNING: AtomicBool = AtomicBool::new(false);
@@ -186,8 +188,8 @@ impl CameraEncoder {
 		let config = crate::video_encode::Config {
 			width: WIDTH as u32,
 			height: HEIGHT as u32,
-			fps: 15,
-			bit_rate: 600_000,
+			fps: FPS,
+			bit_rate: BIT_RATE,
 			max_bytes: MAX_ENCODED_BYTES,
 			profile: crate::video_encode::Profile::Baseline,
 		};
@@ -220,10 +222,10 @@ impl CameraEncoder {
 		})
 	}
 
-	/// Encodes one 640×480 packed RGB picture, keeping the frame's pixels for local preview.
+	/// Encodes one 1280×720 packed RGB picture, keeping the frame's pixels for local preview.
 	fn encode(&mut self, rgb: Vec<u8>) -> Result<Frame, &'static str> {
 		if rgb.len() != WIDTH * HEIGHT * 3 {
-			return Err("Camera did not provide a bounded 640×480 RGB frame");
+			return Err("Camera did not provide a bounded 1280×720 RGB frame");
 		}
 		#[cfg(target_os = "linux")]
 		if let Some(hardware) = self.hardware.as_mut() {
@@ -307,7 +309,7 @@ fn encoder() -> Result<Encoder, &'static str> {
 	Encoder::with_api_config(
 		OpenH264API::from_source(),
 		EncoderConfig::new()
-			.bitrate(BitRate::from_bps(600_000))
+			.bitrate(BitRate::from_bps(BIT_RATE))
 			.max_frame_rate(FrameRate::from_hz(format::FPS as f32))
 			.profile(Profile::Baseline)
 			.num_threads(1)
@@ -322,7 +324,7 @@ fn encode_rgb(
 	rgb: Vec<u8>,
 ) -> Result<Frame, &'static str> {
 	if rgb.len() != WIDTH * HEIGHT * 3 {
-		return Err("Camera did not provide a bounded 640×480 RGB frame");
+		return Err("Camera did not provide a bounded 1280×720 RGB frame");
 	}
 	yuv.read_rgb8(RgbSliceU8::new(&rgb, (WIDTH, HEIGHT)));
 	// ponytail: independently decodable frames tolerate latest-slot drops;
@@ -487,7 +489,7 @@ mod macos {
 				|| !(WIDTH * 4..=WIDTH * 4 + 4096).contains(&stride)
 				|| bytes > CVPixelBufferGetDataSize(&pixels)
 			{
-				return Err("Camera did not provide a bounded 640×480 BGRA frame");
+				return Err("Camera did not provide a bounded 1280×720 BGRA frame");
 			}
 			if CVPixelBufferLockBaseAddress(&pixels, CVPixelBufferLockFlags::ReadOnly) != 0 {
 				return Err("Camera image could not be read");
@@ -567,7 +569,7 @@ mod macos {
 					};
 					let (width, height) = (size.width as usize, size.height as usize);
 					// Prefer modes within the usual ceiling; cameras that only offer larger
-					// ones still work, since AVFoundation scales to 640×480 before delivery.
+					// ones still work, since AVFoundation scales to 1280×720 before delivery.
 					let Some(rank) =
 						format::rank_with_ceiling(width, height, fps, FALLBACK.0, FALLBACK.1)
 					else {
@@ -777,6 +779,16 @@ mod tests {
 			let mut decoder = openh264::decoder::Decoder::new().unwrap();
 			let decoded = decoder.decode(&frame.h264).unwrap().unwrap();
 			assert_eq!(decoded.dimensions(), (WIDTH, HEIGHT));
+			let announcement = crate::camera_video::Sender::default().announcement(1, true);
+			let resolution = &announcement["d"]["streams"][0]["max_resolution"];
+			assert_eq!(
+				resolution["width"].as_u64(),
+				Some(decoded.dimensions().0 as u64)
+			);
+			assert_eq!(
+				resolution["height"].as_u64(),
+				Some(decoded.dimensions().1 as u64)
+			);
 		}
 		let camera = Camera {
 			shared: Arc::new(Shared::default()),

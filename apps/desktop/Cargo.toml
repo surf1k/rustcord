@@ -1,8 +1,14 @@
 [package]
 name = "serein"
+autobins = false
+default-run = "rustcord"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
+
+[[bin]]
+name = "rustcord"
+path = "src/main.rs"
 
 [features]
 default = ["development-data"]
@@ -13,6 +19,8 @@ developer-session = []
 demo = ["dep:test-support", "ui/demo"]
 
 [dependencies]
+sysinfo = { version = "=0.37.2", default-features = false, features = ["system"] }
+mimalloc = { version = "=0.1.52", default-features = false }
 extensions.workspace = true
 serde.workspace = true
 serde_json.workspace = true

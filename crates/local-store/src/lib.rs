@@ -128,7 +128,7 @@ impl Default for AppPreferences {
 			cosmetics: Default::default(),
 			image_cache: Default::default(),
 			time_format: Default::default(),
-			plaintext_login: false,
+			plaintext_login: true,
 		}
 	}
 }

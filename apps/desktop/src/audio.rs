@@ -172,8 +172,8 @@ impl Audio {
 		};
 		let worker = self.worker.as_ref().expect("worker created");
 		if worker.requests.is_closed() {
-			self.status.state = State::Failed("Audio worker stopped; restart Serein");
-			return Err("Audio worker stopped; restart Serein");
+			self.status.state = State::Failed("Audio worker stopped; restart Rustcord");
+			return Err("Audio worker stopped; restart Rustcord");
 		}
 		worker.requests.send_replace(Some(Request {
 			generation,

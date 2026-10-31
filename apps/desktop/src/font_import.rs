@@ -170,16 +170,16 @@ pub fn debug_check() {
 		assert!(definitions.font_data.contains_key("Noto Sans CJK"));
 		assert_eq!(
 			definitions.families[&FontFamily::Proportional][0],
-			"Serein Custom"
+			"Rustcord Custom"
 		);
 		assert_eq!(
-			definitions.font_data["Serein Custom"].bytes(),
+			definitions.font_data["Rustcord Custom"].bytes(),
 			replacement.bytes()
 		);
 		assert!(
 			!definitions.families[&FontFamily::Monospace]
 				.iter()
-				.any(|name| name.starts_with("Serein Custom"))
+				.any(|name| name.starts_with("Rustcord Custom"))
 		);
 	});
 	ui::fonts::apply_custom(&ctx, None);
@@ -190,7 +190,12 @@ pub fn debug_check() {
 			"Inter"
 		);
 		assert!(fonts.definitions().font_data.contains_key("Noto Sans CJK"));
-		assert!(!fonts.definitions().font_data.contains_key("Serein Custom"));
+		assert!(
+			!fonts
+				.definitions()
+				.font_data
+				.contains_key("Rustcord Custom")
+		);
 	});
 	let collection = ctx.fonts(|fonts| {
 		fonts.definitions().font_data["Noto Sans CJK"]
@@ -228,7 +233,7 @@ pub fn debug_check() {
 			assert_eq!(definitions.font_data["Noto Sans CJK"].index, index);
 			assert_eq!(
 				definitions.families[&FontFamily::Proportional][0],
-				"Serein Custom"
+				"Rustcord Custom"
 			);
 		});
 	}

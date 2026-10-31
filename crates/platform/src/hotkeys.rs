@@ -6,15 +6,15 @@ use std::sync::atomic::{AtomicBool, AtomicU8, Ordering};
 use std::sync::{Arc, Mutex, Weak};
 
 const READY: &str = "Global voice keybinds are enabled.";
-const DISABLED: &str = "Global keybinds are off. Shortcuts work while Serein is focused.";
+const DISABLED: &str = "Global keybinds are off. Shortcuts work while Rustcord is focused.";
 #[cfg(target_os = "linux")]
 const WAYLAND_PENDING: &str = "Approve the global voice keybinds in your desktop's dialog.";
 #[cfg(target_os = "linux")]
-const WAYLAND_UNAVAILABLE: &str = "Global voice keybinds were denied or the desktop GlobalShortcuts portal is unavailable; they still work while Serein is focused.";
+const WAYLAND_UNAVAILABLE: &str = "Global voice keybinds were denied or the desktop GlobalShortcuts portal is unavailable; they still work while Rustcord is focused.";
 const UNAVAILABLE: &str =
-	"Global voice keybinds are unavailable on this system; they work while Serein is focused.";
-const INVALID: &str = "One or more voice bindings cannot be registered globally; they still work while Serein is focused.";
-const MODIFIER_REQUIRED: &str = "Add Ctrl, Alt, Shift, or Command to use a voice binding globally; it still works while Serein is focused.";
+	"Global voice keybinds are unavailable on this system; they work while Rustcord is focused.";
+const INVALID: &str = "One or more voice bindings cannot be registered globally; they still work while Rustcord is focused.";
+const MODIFIER_REQUIRED: &str = "Add Ctrl, Alt, Shift, or Command to use a voice binding globally; it still works while Rustcord is focused.";
 
 const PUSH_TO_TALK: usize = 0;
 const TOGGLE_MUTE: usize = 1;
@@ -413,10 +413,10 @@ async fn portal(
 	use ashpd::desktop::global_shortcuts::{GlobalShortcuts, NewShortcut};
 	use futures_util::StreamExt;
 	let shortcuts: Vec<_> = [
-		("push-to-talk", "Serein push to talk"),
-		("mute", "Toggle Serein microphone mute"),
-		("deafen", "Toggle Serein deafen"),
-		("push-to-mute", "Serein push to mute"),
+		("push-to-talk", "Rustcord push to talk"),
+		("mute", "Toggle Rustcord microphone mute"),
+		("deafen", "Toggle Rustcord deafen"),
+		("push-to-mute", "Rustcord push to mute"),
 	]
 	.into_iter()
 	.zip(bindings.iter())

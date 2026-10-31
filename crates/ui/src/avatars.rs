@@ -32,11 +32,11 @@ struct Animation {
 }
 
 // Emoji artwork has its own working set so media cannot evict it.
-const EMOJI_TEXTURES: usize = 1024;
-const EMOJI_TEXTURE_BYTES: usize = 16 * 1024 * 1024;
-const TEXTURES: usize = 512;
-const TEXTURE_BYTES: usize = 64 * 1024 * 1024;
-const IDLE_TEXTURES: Duration = Duration::from_secs(60);
+const EMOJI_TEXTURES: usize = 256;
+const EMOJI_TEXTURE_BYTES: usize = 4 * 1024 * 1024;
+const TEXTURES: usize = 128;
+const TEXTURE_BYTES: usize = 16 * 1024 * 1024;
+const IDLE_TEXTURES: Duration = Duration::from_secs(30);
 /// Longest edge for string-keyed artwork: stickers, picker previews, banners and activity art.
 pub const EMBED_EDGE: u32 = 512;
 /// Longest edge for profile frame layers, which span a whole card.
@@ -2916,7 +2916,7 @@ mod tests {
 				Some(ColorImage::filled([512, 512], egui::Color32::WHITE)),
 			);
 		}
-		assert_eq!(avatars.textures.len(), 64);
+		assert_eq!(avatars.textures.len(), TEXTURE_BYTES / (512 * 512 * 4));
 		assert_eq!(avatars.texture_id("emoji-9001"), Some(emoji_texture));
 		assert_eq!(avatars.emoji_bytes, 64 * 64 * 4);
 		avatars.take_requests();

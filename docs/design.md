@@ -186,3 +186,21 @@ and Post controls. Its content scrolls while the footer remains available. Escap
 the close icon and a backdrop click dismiss an idle editor; a pending submission
 keeps it open. Unknown results and expired but unfinalized polls retain explicit
 status text. `--features demo -- --demo --demo-polls` previews the fixture offline.
+
+## Rustcord fork controls
+
+The application display name is Rustcord. Its inherited native app identity remains
+`cz.viceverse.serein` to preserve credential-store, tray, and desktop integration.
+The executable is `rustcord` (`rustcord.exe` on Windows); the Cargo package remains
+`serein` for compatibility with workspace dependencies.
+
+A small bottom-right CPU/RAM display samples the main process on a background worker
+once per second. RAM is resident memory (RSS); CPU 100% represents one logical core.
+Temporary sign-in and native media helper processes are excluded, as explained by the
+hover text. The display is local-only and never sends samples over the network.
+
+A visible Mark All As Read control below Home uses the existing bounded service
+acknowledgement pipeline. Holding the middle mouse button uses bounded timeline
+movement and delayed repaint; loss of pointer or window focus clears held scrolling.
+The account avatar draws a green ring only for current local voice activity in a call.
+Microphone gain and speaker playback gain have independent controls in Voice levels.

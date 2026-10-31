@@ -18,7 +18,7 @@ class NativePackageTest(unittest.TestCase):
             root = Path(directory)
             staged = root / "staged"
             staged.mkdir()
-            shutil.copyfile("/bin/true", staged / "serein")
+            shutil.copyfile("/bin/true", staged / "rustcord")
             for name in ["README.md", "LICENSE-MIT", "LICENSE-APACHE", "THIRD_PARTY_NOTICES.md"]:
                 (staged / name).write_text("synthetic package fixture\n")
             (staged / "docs").mkdir()
@@ -70,7 +70,7 @@ class NativePackageTest(unittest.TestCase):
                         packaging.native_package(staged, "0.1.0-test", FORMAT)
                 with self.assertRaisesRegex(ValueError, "semantic application version"):
                     packaging.native_package(staged, "0.1.0\nmalformed", FORMAT)
-                (staged / "serein").write_bytes(b"MZ synthetic wrong architecture")
+                (staged / "rustcord").write_bytes(b"MZ synthetic wrong architecture")
                 with self.assertRaisesRegex(ValueError, "ELF executable"):
                     packaging.native_package(staged, "0.1.0", FORMAT)
                 return
@@ -96,7 +96,7 @@ class NativePackageTest(unittest.TestCase):
                     artifact, wrong_stage, check, "0.1.0~test-1",
                     packaging.output("dpkg", "--print-architecture"),
                     packaging.output("dpkg-deb", "--field", str(artifact), "Depends"))
-            (staged / "serein").write_bytes(b"MZ synthetic wrong architecture")
+            (staged / "rustcord").write_bytes(b"MZ synthetic wrong architecture")
             with self.assertRaisesRegex(ValueError, "ELF executable"):
                 packaging.package(staged, "0.1.0")
 

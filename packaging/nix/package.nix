@@ -163,7 +163,7 @@ in
                 docs="$out/share/doc/serein"
             ''
             + lib.optionalString isDarwin ''
-                app="$out/Applications/Serein.app/Contents"
+                app="$out/Applications/Rustcord.app/Contents"
                 docs="$app/Resources"
             ''
             + ''
@@ -182,7 +182,7 @@ in
                 install -Dm444 packaging/linux/serein.desktop \
                   $out/share/applications/cz.viceverse.serein.desktop
                 substituteInPlace $out/share/applications/cz.viceverse.serein.desktop \
-                  --replace-fail "Exec=serein" "Exec=$out/bin/serein"
+                  --replace-fail "Exec=rustcord" "Exec=$out/bin/rustcord"
                 mkdir -p $out/share/icons
                 cp -R packaging/linux/hicolor $out/share/icons/
             ''
@@ -192,8 +192,8 @@ in
                 install -Dm444 packaging/macos/Info.plist "$app/Info.plist"
                 install -Dm444 packaging/macos/Serein.icns "$app/Resources/Serein.icns"
                 mkdir -p "$app/MacOS" "$out/share/doc"
-                mv "$out/bin/serein" "$app/MacOS/serein"
-                ln -s "$app/MacOS/serein" "$out/bin/serein"
+                mv "$out/bin/rustcord" "$app/MacOS/rustcord"
+                ln -s "$app/MacOS/rustcord" "$out/bin/rustcord"
                 ln -s "$app/Resources" "$out/share/doc/serein"
             '';
 
@@ -205,7 +205,7 @@ in
                 asl20
             ];
             platforms = lib.platforms.linux ++ lib.platforms.darwin;
-            mainProgram = "serein";
+            mainProgram = "rustcord";
             maintainers = with lib.maintainers; [
                 myamusashi
             ];

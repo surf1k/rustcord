@@ -676,22 +676,21 @@ mod tests {
 		assert_eq!(effective_fps(0, 15), None);
 		assert_eq!(effective_fps(1, 0), None);
 		let pixels = Pixels {
-			width: 1280,
-			height: 720,
+			width: 640,
+			height: 480,
 			format: MJPEG,
 			field: 1,
 			size: MAX_FRAME_BYTES as u32,
 			..Pixels::default()
 		};
 		assert!(validate_format(pixels).is_ok());
-		let rgb = fit_rgb(vec![255; 1280 * 720 * 3], pixels).unwrap();
+		let rgb = fit_rgb(vec![255; 640 * 480 * 3], pixels).unwrap();
 		assert_eq!(rgb.len(), WIDTH * HEIGHT * 3);
-		// 16:9 input is centered in the 4:3 encoder, keeping black bars above/below.
-		assert_eq!(&rgb[..WIDTH * 3], vec![0; WIDTH * 3]);
-		assert_eq!(
-			&rgb[(HEIGHT / 2) * WIDTH * 3..(HEIGHT / 2 + 1) * WIDTH * 3],
-			vec![255; WIDTH * 3]
-		);
+		// 4:3 input is centered in the 16:9 encoder without stretching the camera picture.
+		let row = &rgb[(HEIGHT / 2) * WIDTH * 3..(HEIGHT / 2 + 1) * WIDTH * 3];
+		assert_eq!(&row[..160 * 3], vec![0; 160 * 3]);
+		assert_eq!(&row[160 * 3..1120 * 3], vec![255; 960 * 3]);
+		assert_eq!(&row[1120 * 3..], vec![0; 160 * 3]);
 	}
 
 	#[test]

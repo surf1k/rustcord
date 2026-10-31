@@ -303,7 +303,7 @@ mod macos {
 		// SAFETY: NSObject has no subclassing requirements. The handler stays on the main
 		// thread and is retained until it is unregistered on drop.
 		#[unsafe(super = NSObject)]
-		#[name = "SereinReopenHandler"]
+		#[name = "RustcordReopenHandler"]
 		#[thread_kind = MainThreadOnly]
 		#[ivars = State]
 		struct Handler;

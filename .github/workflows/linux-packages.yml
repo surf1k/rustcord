@@ -183,7 +183,7 @@ jobs:
           TAG: ${{ inputs.tag || 'development' }}
         run: |
           mkdir release-assets
-          cp target/flatpak-build/Serein-linux.flatpak "release-assets/serein-$TAG-Linux-x86_64.flatpak"
+          cp target/flatpak-build/Rustcord-linux.flatpak "release-assets/serein-$TAG-Linux-x86_64.flatpak"
           cp target/flatpak-build/serein.flatpakref "release-assets/serein.flatpakref"
       - uses: actions/upload-artifact@v7.0.1
         with:

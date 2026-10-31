@@ -1,5 +1,15 @@
 # Third-party notices
 
+The Rustcord fork's local CPU/RAM display uses **sysinfo 0.37.2** (MIT), with only
+its system/process feature enabled. OS queries run on one worker once per second,
+without reading command lines, environment variables, network statistics or other processes.
+Its unmodified license is bundled at `assets/licenses/files/sysinfo-0.37.2-LICENSE`.
+The Windows-only **ntapi 0.4.3** dependency uses its MIT option, retained at
+`assets/licenses/files/ntapi-0.4.3-LICENSE-MIT`. macOS **objc2-io-kit 0.3.2**
+declares MIT/Apache-2.0/Zlib; the existing objc2 notices remain bundled under
+`assets/licenses/dependencies` and `assets/licenses/notifications`.
+Versions, sources and archive checksums are recorded in `Cargo.lock`.
+
 Discord Lottie sticker previews use **rasterlottie 0.2.2** (MIT OR Apache-2.0)
 with default features disabled. Serein uses the MIT option; its unmodified MIT
 license is retained in `assets/licenses/files/rasterlottie-0.2.2-LICENSE-MIT`.

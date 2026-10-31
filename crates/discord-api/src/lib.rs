@@ -20,6 +20,7 @@ pub use profile_edit::debug_profile_board_request_check;
 pub mod proxy;
 #[cfg(test)]
 mod proxy_tests;
+pub mod quests;
 pub mod rpc;
 mod server_actions;
 mod server_admin;

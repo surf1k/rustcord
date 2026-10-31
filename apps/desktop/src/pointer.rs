@@ -8,7 +8,7 @@ pub struct Intercepted {
 	pub side: SidePress,
 }
 
-/// The window's pointer, translated for Serein.
+/// The window's pointer, translated for Rustcord.
 ///
 /// Holds the two facts `RawInput` cannot carry across frames: whether the middle button is
 /// still down after a frame with no events, and the last position the cursor was seen at.
@@ -32,10 +32,24 @@ impl Pointer {
 		track: bool,
 		keep_buttons: bool,
 	) -> Intercepted {
+		let intercepted = self.intercept_events(raw, keep_buttons);
+		if track
+			&& raw.focused
+			&& let Some(at) = Self::client_cursor(window, pixels_per_point)
+			&& self.last != Some(at)
+		{
+			// Appended last so a same-batch `PointerGone` from `CursorLeft` is restored.
+			self.last = Some(at);
+			raw.events.push(Event::PointerMoved(at));
+		}
+		intercepted
+	}
+
+	fn intercept_events(&mut self, raw: &mut RawInput, keep_buttons: bool) -> Intercepted {
 		let mut middle = Middle::default();
 		let mut side = SidePress::default();
 		raw.events.retain(|event| match event {
-			// Serein uses middle-click for autoscroll, including over text edits.
+			// Rustcord uses middle-click for autoscroll, including over text edits.
 			Event::MiddleClickPaste { .. } => false,
 			Event::PointerButton {
 				pos,
@@ -73,17 +87,19 @@ impl Pointer {
 				self.last = Some(*pos);
 				true
 			}
+			Event::PointerGone | Event::WindowFocused(false) => {
+				self.down = false;
+				self.last = None;
+				middle.pressed = None;
+				true
+			}
 			_ => true,
 		});
-		middle.down = self.down;
-		if track
-			&& let Some(at) = Self::client_cursor(window, pixels_per_point)
-			&& self.last != Some(at)
-		{
-			// Appended last so a same-batch `PointerGone` from `CursorLeft` is restored.
-			self.last = Some(at);
-			raw.events.push(Event::PointerMoved(at));
+		if !raw.focused {
+			self.down = false;
+			middle.pressed = None;
 		}
+		middle.down = self.down;
 		Intercepted { middle, side }
 	}
 
@@ -94,5 +110,46 @@ impl Pointer {
 			(x - f64::from(origin.x)) as f32 / pixels_per_point,
 			(y - f64::from(origin.y)) as f32 / pixels_per_point,
 		))
+	}
+}
+
+#[cfg(test)]
+mod tests {
+	use super::*;
+
+	#[test]
+	fn leaving_window_cannot_keep_middle_held_after_a_missed_release() {
+		let mut pointer = Pointer::default();
+		let press = Event::PointerButton {
+			pos: pos2(24.0, 36.0),
+			button: PointerButton::Middle,
+			pressed: true,
+			modifiers: eframe::egui::Modifiers::NONE,
+		};
+		let mut raw = RawInput {
+			focused: true,
+			events: vec![press.clone()],
+			..Default::default()
+		};
+		assert!(pointer.intercept_events(&mut raw, false).middle.down);
+		assert!(
+			raw.events.is_empty(),
+			"middle press must not start egui text selection"
+		);
+		raw.events = vec![Event::PointerGone];
+		assert!(!pointer.intercept_events(&mut raw, false).middle.down);
+		raw.events.clear();
+		assert!(!pointer.intercept_events(&mut raw, false).middle.down);
+		// Focus loss may arrive without CursorLeft; it must have the same cancellation behavior.
+		raw.events = vec![press];
+		assert!(pointer.intercept_events(&mut raw, true).middle.down);
+		assert_eq!(
+			raw.events.len(),
+			1,
+			"a bound middle button remains available to keybindings"
+		);
+		raw.focused = false;
+		raw.events.clear();
+		assert!(!pointer.intercept_events(&mut raw, true).middle.down);
 	}
 }

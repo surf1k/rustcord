@@ -48,7 +48,7 @@ jobs:
       - name: Build
         run: nix build --print-build-logs --show-trace .#serein
       - name: Verify installed binary
-        run: test -x result/bin/serein
+        run: test -x result/bin/rustcord
       - name: Verify bundled notices and corresponding source
         shell: bash
         run: |
@@ -76,5 +76,5 @@ jobs:
       - name: Verify macOS app bundle
         if: runner.os == 'macOS'
         run: |
-          test -x result/Applications/Serein.app/Contents/MacOS/serein
-          plutil -lint result/Applications/Serein.app/Contents/Info.plist
+          test -x result/Applications/Rustcord.app/Contents/MacOS/rustcord
+          plutil -lint result/Applications/Rustcord.app/Contents/Info.plist

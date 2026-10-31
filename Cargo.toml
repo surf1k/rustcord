@@ -50,13 +50,11 @@ global-hotkey = "=0.8.0"
 unsafe_code = "forbid"
 
 [profile.release]
-# Fat LTO inlines across the bundled C libraries (libopus, sqlite, sonora) and drops their
-# unused code; stripping the symbol table removes the 7-8 MB `__LINKEDIT`/`.symtab` from the
-# shipped binary. Line tables still land in the split debug file for symbolicating crashes.
-lto = "fat"
-codegen-units = 1
+lto = "thin"
+codegen-units = 16
 strip = "symbols"
-debug = "line-tables-only"
+debug = false
+opt-level = 3
 
 # Real-time echo processing must also keep up in otherwise unoptimized dev builds.
 [profile.dev.package.sonora]

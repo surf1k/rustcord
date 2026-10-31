@@ -63,7 +63,9 @@ pub const DISCORD_LINE_SCROLL_SPEED: f32 = 120.0;
 pub const DEAD_ZONE: f32 = 15.0;
 const CURVE: f32 = 2.2;
 const GAIN: f32 = 0.11;
-const CEILING: f32 = 48_000.0;
+// A fast pointer must not make the virtualized timeline lay out pages of messages each frame.
+const CEILING: f32 = 4_000.0;
+pub(super) const REPAINT_INTERVAL: std::time::Duration = std::time::Duration::from_millis(16);
 
 /// The middle button over one frame, delivered outside egui's pointer state.
 ///
@@ -123,6 +125,9 @@ pub struct Session {
 /// Scroll speed in points per second for a cursor `offset` points from the drive origin.
 /// Signed like `offset`. Dead zone is a gate, not subtracted.
 pub fn speed(offset: f32) -> f32 {
+	if !offset.is_finite() {
+		return 0.0;
+	}
 	let distance = offset.abs();
 	if distance <= DEAD_ZONE {
 		return 0.0;
@@ -158,8 +163,9 @@ impl Session {
 		match self.drive {
 			Drive::Driving { aim, .. } if aim.target == target => {
 				self.bound = true;
-				let dt = ui.input(|input| input.stable_dt).min(0.05);
-				-speed(aim.cursor.y - aim.origin.y) * dt
+				let dt = ui.input(|input| input.stable_dt).clamp(0.0, 0.05);
+				let limit = (area.height() * 0.25).max(0.0);
+				(-speed(aim.cursor.y - aim.origin.y) * dt).clamp(-limit, limit)
 			}
 			_ => 0.0,
 		}
@@ -195,7 +201,7 @@ impl Session {
 			return builder;
 		}
 		self.last_offset = Some((target, next));
-		ui.ctx().request_repaint();
+		ui.ctx().request_repaint_after(REPAINT_INTERVAL);
 		builder.vertical_scroll_offset(next)
 	}
 
@@ -257,7 +263,9 @@ impl Session {
 		});
 		aim.cursor = hover.unwrap_or(aim.cursor);
 
-		if !focused || escape || wheel || egui_pressed {
+		// Wayland cannot query a cursor outside this window. A release there may never arrive;
+		// keeping the last coordinate/down bit alive would keep repainting a stale drive forever.
+		if !focused || hover.is_none() || escape || wheel || egui_pressed {
 			self.idle();
 			return egui_pressed;
 		}
@@ -321,4 +329,74 @@ impl Session {
 
 fn clamped_away(requested: f32, current: f32, next: f32) -> bool {
 	(requested - current).abs() > 0.5 && (next - current).signum() == (requested - current).signum()
+}
+
+#[cfg(test)]
+mod tests {
+	use super::*;
+
+	#[test]
+	fn held_autoscroll_is_bounded_and_cancels_when_pointer_leaves() {
+		let ctx = egui::Context::default();
+		let mut session = Session::default();
+		let area = Rect::from_min_size(Pos2::ZERO, egui::vec2(400.0, 300.0));
+		let target = egui::Id::unique("autoscroll-regression");
+		let origin = pos2(50.0, 50.0);
+		let mut frame = |events, middle| {
+			session.middle(middle);
+			let mut delta = 0.0;
+			ctx.run_ui(
+				egui::RawInput {
+					focused: true,
+					events,
+					screen_rect: Some(area),
+					..Default::default()
+				},
+				|ui| delta = session.bind(ui, target, area),
+			)
+			.drop_without_applying_deltas();
+			(delta, session.holding())
+		};
+		assert!(
+			frame(
+				vec![egui::Event::PointerMoved(origin)],
+				Middle {
+					pressed: Some(origin),
+					down: true
+				}
+			)
+			.1
+		);
+		let (delta, holding) = frame(
+			vec![egui::Event::PointerMoved(pos2(50.0, 1_000_000.0))],
+			Middle {
+				pressed: None,
+				down: true,
+			},
+		);
+		assert!(holding);
+		assert!(delta.is_finite() && delta < 0.0 && delta.abs() <= area.height() * 0.25);
+		// A release outside a Wayland surface may never arrive. PointerGone must end the drive
+		// even when the host's last known middle-button state is still down.
+		assert_eq!(
+			frame(
+				vec![egui::Event::PointerGone],
+				Middle {
+					pressed: None,
+					down: true
+				}
+			),
+			(0.0, false)
+		);
+		assert!(
+			frame(
+				vec![egui::Event::PointerMoved(origin)],
+				Middle {
+					pressed: Some(origin),
+					down: true
+				}
+			)
+			.1
+		);
+	}
 }

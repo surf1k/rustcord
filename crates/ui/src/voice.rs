@@ -386,6 +386,24 @@ impl MessagingUi {
 			});
 	}
 
+	/// Local activity comes from the live media worker, never from the presence status.
+	pub(super) fn self_voice_speaking(&self, state: &State) -> bool {
+		let Some(user) = state.user.as_ref() else {
+			return false;
+		};
+		state.voice.active.as_ref().is_some_and(|call| {
+			matches!(call.phase, Phase::Connected | Phase::Waiting)
+				&& !call.self_muted()
+				&& !call.server_muted
+				&& !call.server_deafened
+				&& !self.voice_muted
+				&& !self.voice_deafened
+				&& !self.voice_ptm_active
+				&& (!self.voice_push_to_talk || self.voice_ptt_active)
+				&& self.voice_speaking.contains(&user.id)
+		})
+	}
+
 	fn is_speaking(&self, state: &State, channel: Id, participant: &Participant) -> bool {
 		!inactive_recipient(state, channel, participant.user)
 			&& !self.voice_user_locally_muted(participant.user)
@@ -4030,6 +4048,17 @@ impl MessagingUi {
 						};
 					}
 				});
+				egui::CollapsingHeader::new("Voice levels")
+					.id_salt("call-quick-levels")
+					.show(ui, |ui| {
+						ui.add_enabled_ui(self.voice_available && !state.demo, |ui| {
+							gain_slider(ui, &mut self.voice_gain.input_percent, "My microphone gain");
+							gain_slider(ui, &mut self.voice_gain.output_percent, "My speaker volume");
+							if ui.small_button("Devices, sensitivity and microphone test").clicked() {
+								self.open_voice_settings();
+							}
+						});
+					});
 				if camera_clicked && let Some(command) = state.set_call_camera(!camera) {
 					self.voice_camera_status = "";
 					commands.push(command);
@@ -4385,7 +4414,7 @@ fn call_failure(ui: &mut egui::Ui, error: Option<&str>, color: egui::Color32) {
 			.clicked()
 			{
 				ui.ctx()
-					.copy_text(format!("Serein call failed\nReason: {error}"));
+					.copy_text(format!("Rustcord call failed\nReason: {error}"));
 			}
 			ui.with_layout(egui::Layout::top_down(egui::Align::Min), |ui| {
 				ui.add(
@@ -4825,6 +4854,30 @@ fn device_combo(
 #[cfg(test)]
 mod tests {
 	use super::*;
+
+	#[test]
+	fn own_activity_cannot_survive_mute_push_to_talk_or_disconnect() {
+		let mut state = test_support::call_demo_state();
+		let own = state.user.as_ref().unwrap().id;
+		let mut view = crate::MessagingUi::default();
+		view.voice_speaking.push(own);
+		let call = state.voice.active.as_mut().unwrap();
+		call.phase = Phase::Connected;
+		call.muted = false;
+		call.deafened = false;
+		assert!(view.self_voice_speaking(&state));
+		view.voice_muted = true;
+		assert!(!view.self_voice_speaking(&state));
+		view.voice_muted = false;
+		view.voice_push_to_talk = true;
+		assert!(!view.self_voice_speaking(&state));
+		view.voice_ptt_active = true;
+		assert!(view.self_voice_speaking(&state));
+		state.voice.active.as_mut().unwrap().server_muted = true;
+		assert!(!view.self_voice_speaking(&state));
+		state.voice.active = None;
+		assert!(!view.self_voice_speaking(&state));
+	}
 
 	#[test]
 	fn explicit_join_audio_waits_for_call_switch_and_survives_teardown() {

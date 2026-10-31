@@ -959,7 +959,7 @@ impl MessagingUi {
 				Some(Ok(model::InvitePreview {
 					guild: Id(424242),
 					embed: model::Embed {
-						title: Some("Serein community".into()),
+						title: Some("Rustcord community".into()),
 						..Default::default()
 					},
 				})),
@@ -2153,6 +2153,13 @@ impl MessagingUi {
 							ui.spacing_mut().item_spacing.x = 8.0;
 							if let Some(user) = &state.user {
 								let avatar = self.avatars.show(ui, user, 32.0, state.demo);
+								if self.self_voice_speaking(state) {
+									ui.painter().circle_stroke(
+										avatar.rect.center(),
+										avatar.rect.width() * 0.5 + 2.0,
+										egui::Stroke::new(2.0, colors.positive),
+									);
+								}
 								avatar.widget_info(|| {
 									egui::WidgetInfo::labeled(
 										egui::Role::Button,

@@ -1,4 +1,8 @@
 #![cfg_attr(target_os = "windows", windows_subsystem = "windows")]
+
+#[global_allocator]
+static GLOBAL: mimalloc::MiMalloc = mimalloc::MiMalloc;
+
 #[cfg(feature = "demo")]
 mod access_marks_demo;
 mod app_settings;
@@ -42,10 +46,12 @@ mod polls_demo;
 #[cfg(feature = "demo")]
 mod post_menu_demo;
 mod proxy_auth;
+mod quests;
 mod reading_settings;
 mod registered_games;
 #[cfg(feature = "demo")]
 mod rendering_demo;
+mod resources;
 mod screen;
 #[cfg(feature = "demo")]
 mod server_settings_demo;
@@ -312,6 +318,7 @@ fn main() -> eframe::Result {
 					tertiary_color: None,
 					position: 1,
 					hoist: false,
+					managed: false,
 					bits: 0,
 				},
 			}),
@@ -507,7 +514,7 @@ fn main() -> eframe::Result {
 				)
 				.with_min_inner_size(app_settings::MIN_WINDOW_SIZE.map(|size| size as f32))
 				.with_active(!start_minimized)
-				.with_app_id("cz.viceverse.serein");
+				.with_app_id("rustcord");
 			#[cfg(any(target_os = "windows", target_os = "linux"))]
 			let builder = builder
 				.with_icon(eframe::icon_data::from_png_bytes(icon).expect("bundled app icon"));
@@ -574,7 +581,7 @@ fn main() -> eframe::Result {
 		..Default::default()
 	};
 	let result = eframe::run_native(
-		"Serein",
+		"Rustcord",
 		options,
 		Box::new(move |cc| {
 			let mut desktop =
@@ -601,7 +608,7 @@ fn main() -> eframe::Result {
 	// Quitting mid-share drops media workers that are still closing their encoders, and
 	// NVIDIA's exit handlers crash or deadlock if the process exits during that teardown.
 	if !discord_voice::wait_for_media_threads(std::time::Duration::from_secs(5)) {
-		eprintln!("Screen or camera capture was still closing when Serein exited.");
+		eprintln!("Screen or camera capture was still closing when Rustcord exited.");
 	}
 	result
 }
@@ -934,7 +941,7 @@ impl Drop for FrameMetrics {
 			let _ = writeln!(
 				std::io::stderr(),
 				// Preserve the legacy diagnostic label; elapsed callback time is wall time.
-				"[Serein frames] callbacks={} without_input={} cpu_us_buckets(1000,2000,4000,8000,16000,32000,64000,above)={:?} reflows(total,consecutive)={:?}",
+				"[Rustcord frames] callbacks={} without_input={} cpu_us_buckets(1000,2000,4000,8000,16000,32000,64000,above)={:?} reflows(total,consecutive)={:?}",
 				self.frames,
 				self.inputless,
 				self.buckets,
@@ -958,6 +965,7 @@ impl SessionEnd {
 	}
 }
 struct Desktop {
+	quests: quests::Quests,
 	proxy_auth: proxy_auth::Authentication,
 	api_proxy: tokio::sync::watch::Sender<Option<discord_api::proxy::ApiProxy>>,
 	extensions: extension_bridge::Bridge,
@@ -1506,7 +1514,7 @@ impl Desktop {
 		let plaintext_login = !demo
 			&& preferences
 				.as_ref()
-				.is_ok_and(|preferences| preferences.plaintext_login);
+				.map_or(true, |preferences| preferences.plaintext_login);
 		if !demo {
 			platform::plaintext_login::configure(plaintext_login_dir(), plaintext_login);
 		}
@@ -1657,6 +1665,7 @@ impl Desktop {
 							tertiary_color: None,
 							position: 2,
 							hoist: true,
+							managed: false,
 						},
 						model::permissions::Role {
 							id: model::Id(9002),
@@ -1667,6 +1676,7 @@ impl Desktop {
 							tertiary_color: gradient_roles.then_some(16761760),
 							position: 1,
 							hoist: true,
+							managed: false,
 						},
 					]);
 				}
@@ -2287,6 +2297,7 @@ impl Desktop {
 			.map(|menu| (menu, ui::i18n::Language::System))
 		};
 		Ok(Self {
+			quests: quests::Quests::default(),
 			proxy_auth: proxy_auth::Authentication::default(),
 			api_proxy: tokio::sync::watch::channel(None).0,
 			extensions: extension_bridge::Bridge::default(),
@@ -2776,14 +2787,12 @@ impl Desktop {
 					None
 				}
 				Command::Website => {
-					ctx.open_url(egui::OpenUrl::new_tab(
-						"https://github.com/ViceVerse-cz/Serein",
-					));
+					ctx.open_url(egui::OpenUrl::new_tab("https://github.com/surf1k/Serein"));
 					None
 				}
 				Command::ReportIssue => {
 					ctx.open_url(egui::OpenUrl::new_tab(
-						"https://github.com/ViceVerse-cz/Serein/issues/new/choose",
+						"https://github.com/surf1k/Serein/issues/new/choose",
 					));
 					None
 				}
@@ -2793,7 +2802,7 @@ impl Desktop {
 			}
 		}
 	}
-	/// Whether closing may keep Serein running without a window. macOS apps stay in the Dock
+	/// Whether closing may keep Rustcord running without a window. macOS apps stay in the Dock
 	/// until quit, and the Dock icon reopens the window.
 	fn background_available(&self) -> bool {
 		cfg!(target_os = "macos") || self.tray_available()
@@ -4422,14 +4431,14 @@ impl Desktop {
 						if self.messaging.custom_font.busy && self.font_picker.is_none() {
 							self.messaging.custom_font.busy = false;
 							self.messaging.custom_font.status =
-								"Local storage worker stopped. Restart Serein to save fonts.";
+								"Local storage worker stopped. Restart Rustcord to save fonts.";
 						}
 						if self.messaging.channel_preferences_reload
 							|| self.messaging.channel_preferences_load_pending
 						{
 							self.messaging.channel_preferences_reload = false;
 							self.messaging.channel_preferences_load_pending = false;
-							self.messaging.channel_preferences_status = "Local storage worker stopped; restart Serein to restore channel preferences.";
+							self.messaging.channel_preferences_status = "Local storage worker stopped; restart Rustcord to restore channel preferences.";
 						}
 						presence_cache_stopped = self.presence_load_pending;
 						break;
@@ -4770,7 +4779,7 @@ impl Desktop {
 					if result.is_err() {
 						self.messaging.toasts.push(
 							ui::design::Level::Error,
-							"Could not delete the plaintext saved logins in Serein's data folder",
+							"Could not delete the plaintext saved logins in Rustcord's data folder",
 						);
 					} else if !enabled {
 						self.credential_status = "Plaintext saved logins deleted";
@@ -4783,7 +4792,7 @@ impl Desktop {
 						// Nothing could have been saved without a credential store.
 						Err(platform::CredentialError::NoStore) => "",
 						Err(_) => {
-							"Could not remove the Serein saved login in your OS credential manager"
+							"Could not remove the Rustcord saved login in your OS credential manager"
 						}
 					};
 				}
@@ -5092,7 +5101,7 @@ impl Desktop {
 					// One extra fixed-label terminal line per enabled scope; closed stderr is OK.
 					let _ = writeln!(
 						std::io::stderr(),
-						"[Serein {scope}] Session stopped: {}",
+						"[Rustcord {scope}] Session stopped: {}",
 						failure.label()
 					);
 				}
@@ -5878,7 +5887,7 @@ impl eframe::App for Desktop {
 						ui.painter().rect_filled(rect, 8, p.accent);
 						ui::icons::paint(
 							ui.painter(),
-							ui::icons::Icon::Serein,
+							ui::icons::Icon::Rustcord,
 							rect.shrink(7.0),
 							p.accent_text,
 						);
@@ -6617,6 +6626,42 @@ impl eframe::App for Desktop {
 			}
 		}
 		ui::design::window_resize(&ctx);
+		let quest_offline = self.fixture_only
+			|| self.state.demo
+			|| self.state.auth != AuthState::Authenticated
+			|| !self.state.gateway_connected;
+		let quest_voice = self.state.voice.active.as_ref().and_then(|call| {
+			if !matches!(
+				call.phase,
+				client_core::voice::Phase::Connected | client_core::voice::Phase::Waiting
+			) {
+				return None;
+			}
+			self.state
+				.user
+				.as_ref()
+				.map(|user| discord_api::quests::VoiceContext {
+					user: user.id,
+					channel: call.channel,
+					guild: call.guild,
+				})
+		});
+		self.quests.show(
+			&ctx,
+			&self.runtime,
+			quests::Session {
+				secret: if quest_offline {
+					None
+				} else {
+					self.current_login.clone()
+				},
+				generation: self.state.generation,
+				offline: quest_offline,
+				proxy: self.api_proxy.subscribe(),
+				voice: quest_voice,
+			},
+		);
+		resources::show(&ctx);
 		self.frame_metrics.reflows = self.messaging.timeline_reflows();
 		self.frame_metrics.finish();
 	}

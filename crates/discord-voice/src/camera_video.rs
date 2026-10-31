@@ -5,7 +5,7 @@ use crate::crypto::Encryption;
 use serde_json::{Value, json};
 use std::collections::VecDeque;
 
-pub const MAX_FRAME_BYTES: usize = 128 * 1024;
+pub const MAX_FRAME_BYTES: usize = crate::camera::MAX_ENCODED_BYTES;
 const PAYLOAD: usize = 1100;
 
 pub struct Frame {
@@ -51,7 +51,7 @@ impl Sender {
 		self.negotiated && self.ssrc != 0
 	}
 	pub fn announcement(&self, audio: u32, enabled: bool) -> Value {
-		json!({"op":12,"d":{"audio_ssrc":audio,"video_ssrc":if enabled {self.ssrc} else {0},"rtx_ssrc":if enabled {self.rtx} else {0},"streams":if enabled {vec![json!({"type":"video","rid":"100","ssrc":self.ssrc,"rtx_ssrc":self.rtx,"active":true,"quality":100,"max_bitrate":600_000,"max_framerate":15,"max_resolution":{"type":"fixed","width":640,"height":480}})]}else{vec![]}}})
+		json!({"op":12,"d":{"audio_ssrc":audio,"video_ssrc":if enabled {self.ssrc} else {0},"rtx_ssrc":if enabled {self.rtx} else {0},"streams":if enabled {vec![json!({"type":"video","rid":"100","ssrc":self.ssrc,"rtx_ssrc":self.rtx,"active":true,"quality":100,"max_bitrate":crate::camera::BIT_RATE,"max_framerate":crate::camera::FPS,"max_resolution":{"type":"fixed","width":crate::camera::WIDTH,"height":crate::camera::HEIGHT}})]}else{vec![]}}})
 	}
 	pub fn clear(&mut self) {
 		self.packets.clear();

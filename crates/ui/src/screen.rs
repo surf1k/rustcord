@@ -42,7 +42,7 @@ impl Default for ScreenUi {
 			capture_status: None,
 			supported: false,
 			preview: None,
-			height: if cfg!(target_os = "linux") { 720 } else { 1080 },
+			height: 1080,
 			fps: 30,
 			cursor: true,
 			audio: cfg!(target_os = "macos"),
@@ -205,6 +205,19 @@ impl ScreenUi {
 		));
 		ui.add_space(6.0);
 		ui.horizontal_wrapped(|ui| {
+			for (label, height, fps) in [
+				("Balanced · 720p30", 720, 30),
+				("Sharp · 1080p30", 1080, 30),
+				("Smooth · 1080p60", 1080, 60),
+			] {
+				if segment(ui, label, self.height == height && self.fps == fps).clicked() {
+					self.height = height;
+					self.fps = fps;
+				}
+			}
+		});
+		ui.add_space(6.0);
+		ui.horizontal_wrapped(|ui| {
 			ui.spacing_mut().item_spacing = egui::vec2(6.0, 6.0);
 			for height in [480, 720, 1080] {
 				if segment(ui, &format!("{height}p"), self.height == height).clicked() {
@@ -228,6 +241,10 @@ impl ScreenUi {
 			}
 		});
 		ui.add_space(4.0);
+		crate::design::hint(
+			ui,
+			"FPS and resolution are targets. Capture, encoder and network conditions may lower them. The local thumbnail is limited to 10 fps; this does not cap the outgoing stream.",
+		);
 		ui.add(
 			egui::Label::new(
 				egui::RichText::new(crate::i18n::translate(

@@ -128,7 +128,7 @@ jobs:
           APPLE_ID: ${{ secrets.APPLE_ID }}
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
           APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
-        run: bash packaging/macos/sign-release.sh "$PACKAGE_ROOT/Serein.app"
+        run: bash packaging/macos/sign-release.sh "$PACKAGE_ROOT/Rustcord.app"
       - name: Archive Mac package
         if: runner.os == 'macOS'
         run: ditto -c -k --sequesterRsrc "$PACKAGE_ROOT" "release-assets/$ASSET.zip"
@@ -203,6 +203,6 @@ jobs:
     with:
       tag: ${{ needs.prepare.outputs.tag }}
       channel: ${{ inputs.channel || 'nightly' }}
-      base_url: https://viceverse-cz.github.io/Serein
+      base_url: https://surf1k.github.io/rustcord
       deploy: true
     secrets: inherit

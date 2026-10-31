@@ -171,7 +171,7 @@ fn main() {
 				}
 				gst::PadProbeReturn::Ok
 			});
-			linux::timestamp_niri_frames(&source).unwrap();
+			linux::timestamp_portal_frames(&source).unwrap();
 		}
 		let pipeline = Capture::new(settings, mode, settings.bit_rate(), source, stop.clone(), ready.clone(), keyframe.clone(), || true).unwrap();
 		let deadline = Instant::now() + Duration::from_secs(5);

@@ -155,7 +155,7 @@ sha256sums_x86_64=('5efa3f71216cced0da707753b96007add5efc9bad256c390ecc020c5a238
 
 package() {
   install -d "$pkgdir/usr/bin" "$pkgdir/usr/share/licenses/$pkgname"
-  install -m755 "$srcdir/usr/bin/serein" "$pkgdir/usr/bin/serein"
+  install -m755 "$srcdir/usr/bin/rustcord" "$pkgdir/usr/bin/rustcord"
   install -d "$pkgdir/usr/share"
   cp -a "$srcdir/usr/share/." "$pkgdir/usr/share/"
   install -m644 "$srcdir/usr/share/doc/serein/LICENSE-MIT" "$pkgdir/usr/share/licenses/$pkgname/LICENSE-MIT"

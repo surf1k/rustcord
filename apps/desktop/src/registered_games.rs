@@ -3,7 +3,7 @@
 use model::registered_games::{self as games, RegisteredGame};
 use std::{path::PathBuf, sync::mpsc};
 
-/// A hundred-odd short entries; anything larger was not written by Serein.
+/// A hundred-odd short entries; anything larger was not written by Rustcord.
 const MAX_FILE: u64 = 64 * 1024;
 /// The picker filters by name, so a very busy machine need not list every helper process.
 const MAX_PROGRAMS: usize = 512;

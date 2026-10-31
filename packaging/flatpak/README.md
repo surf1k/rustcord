@@ -1,3 +1,5 @@
+> These source packaging instructions target the Rustcord fork. Existing upstream download and repository URLs below still provide upstream Serein builds, not a Rustcord release.
+
 # Flatpak
 
 Build on native Linux with Python 3.11+, Git, rustup and the repository's pinned
@@ -19,14 +21,14 @@ exactly Cargo.lock's registry/Git dependencies with
 The actual application build is offline inside Flatpak's build sandbox, using
 the standard release configuration including voice and bundled notices/source.
 The build produces:
-- `target/flatpak-build/Serein-linux.flatpak`: single-file standalone bundle
+- `target/flatpak-build/Rustcord-linux.flatpak`: single-file standalone bundle
 - `target/flatpak-build/repo/`: exported static OSTree repository with static deltas
 - `target/flatpak-build/serein.flatpakref`: one-click repository install file
 
 ### Installing and Automatic Updates
 
 #### Option A: One-click repository install (Recommended for automatic updates)
-To install Serein configured to receive automatic updates from the hosted OSTree repository:
+To install Rustcord configured to receive automatic updates from the hosted OSTree repository:
 
 ```sh
 flatpak install --user packaging/flatpak/serein.flatpakref
@@ -46,13 +48,13 @@ run the corrected workflow with deployment enabled for a release tag containing
 all native build-matrix assets (including Fedora 43) and the Flatpak bundle.
 Until it is republished, use the standalone release bundle below.
 
-The in-app **Settings -> Updates** screen automatically detects when Serein is running
+The in-app **Settings -> Updates** screen automatically detects when Rustcord is running
 inside Flatpak, checks GitHub releases, and prompts you to update through `flatpak update`
 or your desktop software manager when a new release is available.
 
 #### Option B: Standalone bundle (Offline install)
 ```sh
-flatpak install --user ./target/flatpak-build/Serein-linux.flatpak
+flatpak install --user ./target/flatpak-build/Rustcord-linux.flatpak
 flatpak run cz.viceverse.serein
 flatpak uninstall --user cz.viceverse.serein
 ```
@@ -64,12 +66,12 @@ If GTK reports `Locale not supported by C library`, falls back to `C`, and
 subprocess can abort before the authentication window opens. This signature is
 also reported in Flatpak's [mixed-locale issue](https://github.com/flatpak/flatpak/issues/5497)
 and [runtime-locale update issue](https://github.com/flatpak/flatpak/issues/5398).
-Serein now checks GTK's effective encoding after GTK initialization and, inside
+Rustcord now checks GTK's effective encoding after GTK initialization and, inside
 Flatpak only, reports a non-UTF-8 locale before constructing WebKit. This contains
 that known failure state; it does not repair runtime locales or guarantee every
 WebKit subprocess will start.
 
-Fully close and restart Serein after updating the runtime. To inspect the sandbox
+Fully close and restart Rustcord after updating the runtime. To inspect the sandbox
 without signing in:
 
 ```sh
@@ -85,7 +87,7 @@ flatpak run --env=LC_ALL=C.UTF-8 --env=RUST_BACKTRACE=1 cz.viceverse.serein
 ```
 
 The override applies only to that run. Stop at opening the authorization window;
-credentials and account activity are not needed. Serein does not alter environment
+credentials and account activity are not needed. Rustcord does not alter environment
 variables, global locale, sandbox permissions or runtime language configuration.
 UTF-8 encoding alone is not proof that the runtime or login is healthy. Share
 only the locale/version output and redacted startup errors, never credentials or
@@ -104,13 +106,13 @@ Caches/preferences use Flatpak's isolated XDG directories under
 `~/.var/app/cz.viceverse.serein`; a native installation's data is not imported.
 Saved credentials still require the host's unlocked Secret Service and never
 fall back to files. That service permission is not an application-specific
-credential isolation guarantee. Audio access permits microphone use, but Serein's
+credential isolation guarantee. Audio access permits microphone use, but Rustcord's
 existing explicit call/device-testing gates still apply.
 
 Sandboxed login, keyring, file chooser, notifications and physical audio require
 owner-controlled Linux desktop validation. Screen sharing uses the ScreenCast portal
 and PipeWire; optional system audio monitors individual applications through native
-libpulse and the existing PulseAudio socket. Serein's playback and applications without
+libpulse and the existing PulseAudio socket. Rustcord's playback and applications without
 a usable identity are excluded. No additional sandbox permissions are needed.
 The camera adapter uses direct V4L2, with no camera portal; camera capture is
 unavailable under these permissions. Do not grant blanket devices/home access to hide

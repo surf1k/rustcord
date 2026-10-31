@@ -22,7 +22,7 @@ use sha2::{Digest, Sha256};
 
 /// Generated from `extensions/` and pinned to a merged commit by the catalog workflow.
 const CATALOG_URL: &str =
-	"https://raw.githubusercontent.com/ViceVerse-cz/Serein/main/extensions/catalog.json";
+	"https://raw.githubusercontent.com/surf1k/Serein/main/extensions/catalog.json";
 const MAX_PACKAGE: usize = 16 * 1024 * 1024;
 const MAX_RECORD: usize = MAX_PACKAGE + 64 * 1024;
 const MAX_CATALOG: usize = 1024 * 1024;

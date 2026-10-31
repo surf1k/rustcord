@@ -10,7 +10,7 @@ import tomllib
 
 
 ROOT = Path(__file__).resolve().parents[2]
-DEFAULT_REPO_URL = "https://viceverse-cz.github.io/Serein/flatpak/repo"
+DEFAULT_REPO_URL = "https://surf1k.github.io/rustcord/flatpak/repo"
 
 
 def output(*args, cwd=ROOT):
@@ -21,9 +21,9 @@ def generate_flatpakref(repo_url=DEFAULT_REPO_URL):
     return f"""[Flatpak Ref]
 Name=cz.viceverse.serein
 Branch=master
-Title=Serein
+Title=Rustcord
 Comment=Fast, secure and lightweight native Discord client
-Icon=https://viceverse-cz.github.io/Serein/icons/serein.png
+Icon=https://surf1k.github.io/rustcord/icons/serein.png
 Url={repo_url}
 RuntimeRepo=https://flathub.org/repo/flathub.flatpakrepo
 IsRuntime=false
@@ -79,7 +79,7 @@ def main():
         subprocess.run(["flatpak", "build-update-repo", "--generate-static-deltas", "repo"],
                        cwd=destination, check=True)
         subprocess.run(["flatpak", "build-bundle", "--runtime-repo=https://flathub.org/repo/flathub.flatpakrepo",
-                        "repo", "Serein-linux.flatpak", "cz.viceverse.serein"], cwd=destination, check=True)
+                        "repo", "Rustcord-linux.flatpak", "cz.viceverse.serein"], cwd=destination, check=True)
         (destination / "serein.flatpakref").write_text(generate_flatpakref(args.repo_url))
 
 

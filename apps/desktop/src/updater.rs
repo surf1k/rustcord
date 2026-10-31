@@ -18,7 +18,7 @@ mod delta;
 #[path = "updater_install.rs"]
 mod install;
 
-const RELEASES: &str = "https://api.github.com/repos/ViceVerse-cz/Serein/releases";
+const RELEASES: &str = "https://api.github.com/repos/surf1k/rustcord/releases";
 const MAX_METADATA: usize = 2 * 1024 * 1024;
 const MAX_DOWNLOAD: u64 = 512 * 1024 * 1024;
 const CHECK_INTERVAL: Duration = Duration::from_secs(60 * 60);
@@ -129,7 +129,7 @@ impl Updater {
 				self.demo_available = true;
 				view.log = demo_log();
 				self.status =
-					"Synthetic preview: Serein 99.0.0 is available. No network request was made."
+					"Synthetic preview: Rustcord 99.0.0 is available. No network request was made."
 						.into();
 			}
 			if download && self.demo_available {
@@ -204,27 +204,27 @@ impl Updater {
 							Ok(Outcome::Checked(package, log)) => {
 								self.log = Some(log);
 								self.status = package.as_ref().map_or_else(
-									|| "Serein is up to date on this channel.".into(),
+									|| "Rustcord is up to date on this channel.".into(),
 									|p| {
 										if install::flatpak_session() {
 											format!(
-												"Serein {} is available. Update with `flatpak update` or your Software center.",
+												"Rustcord {} is available. Update with `flatpak update` or your Software center.",
 												p.version,
 											)
 										} else if install::nix_session() {
 											format!(
-												"Serein {} is available. Update it through Nix.",
+												"Rustcord {} is available. Update it through Nix.",
 												p.version,
 											)
 										} else if let Some(cmd) =
 											install::linux_package_manager_update_command()
 										{
 											format!(
-												"Serein {} is available. Run `{cmd}` to update.",
+												"Rustcord {} is available. Run `{cmd}` to update.",
 												p.version,
 											)
 										} else {
-											format!("Serein {} is available.", p.version)
+											format!("Rustcord {} is available.", p.version)
 										}
 									},
 								);
@@ -243,7 +243,7 @@ impl Updater {
 								self.armed = true;
 								self.close_requested = true;
 								self.status =
-									"Update ready. Close Serein to install and restart.".into();
+									"Update ready. Close Rustcord to install and restart.".into();
 							}
 							Err(error) => {
 								self.auto_download = false;
@@ -307,7 +307,7 @@ impl Updater {
 					.expect("a supported platform's checked package has a downloadable archive")
 					.size;
 				self.auto_download = false;
-				self.status = format!("Downloading Serein {}…", package.version);
+				self.status = format!("Downloading Rustcord {}…", package.version);
 				self.start(runtime, ctx, total, move |cancel, progress| {
 					download_package(package, cancel, progress)
 				});
@@ -445,7 +445,7 @@ fn client() -> Result<reqwest::Client, String> {
 	reqwest::Client::builder()
 		.https_only(true)
 		.no_proxy()
-		.user_agent(concat!("Serein/", env!("CARGO_PKG_VERSION")))
+		.user_agent(concat!("Rustcord/", env!("CARGO_PKG_VERSION")))
 		.connect_timeout(Duration::from_secs(10))
 		.read_timeout(Duration::from_secs(30))
 		.timeout(Duration::from_secs(600))
@@ -639,6 +639,28 @@ fn plain_markdown(text: &str) -> String {
 	}
 	out.trim().to_owned()
 }
+fn release_asset(release: &Release, name: &str) -> Result<Asset, String> {
+	let mut found = release.assets.iter().filter(|asset| asset.name == name);
+	let asset = found
+		.next()
+		.ok_or_else(|| format!("This release has no {name} package. Try a later release."))?;
+	if found.next().is_some()
+		|| asset.size == 0
+		|| asset.size > MAX_DOWNLOAD
+		|| asset.browser_download_url.len() > 4096
+	{
+		return Err("The release asset metadata is invalid.".into());
+	}
+	let expected = format!(
+		"https://github.com/surf1k/rustcord/releases/download/{}/{name}",
+		release.tag_name
+	);
+	if asset.browser_download_url != expected {
+		return Err("The asset is not from the Rustcord release repository.".into());
+	}
+	Ok(asset.clone())
+}
+
 fn select_release(
 	releases: Vec<Release>,
 	nightly: bool,
@@ -674,27 +696,7 @@ fn select_release(
 			zsync: None,
 		}));
 	};
-	let find = |name: &str| -> Result<Asset, String> {
-		let mut found = release.assets.iter().filter(|asset| asset.name == name);
-		let asset = found
-			.next()
-			.ok_or_else(|| format!("This release has no {name} package. Try a later release."))?;
-		if found.next().is_some()
-			|| asset.size == 0
-			|| asset.size > MAX_DOWNLOAD
-			|| asset.browser_download_url.len() > 4096
-		{
-			return Err("The release asset metadata is invalid.".into());
-		}
-		let expected = format!(
-			"https://github.com/ViceVerse-cz/Serein/releases/download/{}/{name}",
-			release.tag_name
-		);
-		if asset.browser_download_url != expected {
-			return Err("The asset is not from the Serein release repository.".into());
-		}
-		Ok(asset.clone())
-	};
+	let find = |name: &str| release_asset(&release, name);
 	let archive = find(&wanted)?;
 	let checksums = find("SHA256SUMS.txt")?;
 	let zsync = wanted
@@ -960,4 +962,36 @@ pub fn debug_check() -> Result<(), String> {
 		return Err(format!("Release notes parsed as {notes:?}."));
 	}
 	install::debug_check()
+}
+
+#[cfg(test)]
+mod release_origin_tests {
+	use super::*;
+
+	#[test]
+	fn fork_assets_cannot_be_replaced_by_an_upstream_release_download() {
+		let name = "serein-v1.2.3-Windows-X64.zip";
+		let mut release = Release {
+			tag_name: "v1.2.3".into(),
+			draft: false,
+			prerelease: false,
+			assets: vec![Asset {
+				name: name.into(),
+				browser_download_url: format!(
+					"https://github.com/surf1k/rustcord/releases/download/v1.2.3/{name}"
+				),
+				size: 256,
+			}],
+			published_at: None,
+			body: None,
+		};
+		assert!(release_asset(&release, name).is_ok());
+		release.assets[0].browser_download_url =
+			format!("https://github.com/ViceVerse-cz/Serein/releases/download/v1.2.3/{name}");
+		assert!(release_asset(&release, name).is_err());
+		release.assets[0].browser_download_url =
+			format!("https://github.com/surf1k/rustcord/releases/download/v1.2.3/{name}");
+		release.assets.push(release.assets[0].clone());
+		assert!(release_asset(&release, name).is_err());
+	}
 }

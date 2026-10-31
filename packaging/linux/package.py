@@ -48,7 +48,7 @@ def stage_payload(root, stage, prefix="usr"):
     if prefix not in {"usr", "app"}:
         raise ValueError("Installation prefix must be usr or app")
     doc = stage / prefix / "share/doc/serein"
-    copy(root / "serein", stage / prefix / "bin/serein")
+    copy(root / "rustcord", stage / prefix / "bin/rustcord")
     desktop = stage / prefix / "share/applications/cz.viceverse.serein.desktop"
     desktop.parent.mkdir(parents=True)
     desktop.write_text(Path("packaging/linux/serein.desktop").read_text(), encoding="utf-8")
@@ -66,7 +66,7 @@ def stage_payload(root, stage, prefix="usr"):
     for name in ["files", "notifications", "login", "audio", "voice", "dependencies"]:
         copy(root / "licenses" / name, doc / "licenses" / name, Path("assets/licenses") / name)
     for path in [stage, *stage.rglob("*")]:
-        path.chmod(0o755 if path.is_dir() or path == stage / prefix / "bin/serein" else 0o644)
+        path.chmod(0o755 if path.is_dir() or path == stage / prefix / "bin/rustcord" else 0o644)
 
 
 def smoke(package, stage, temporary, version, architecture, depends):
@@ -85,7 +85,7 @@ def smoke(package, stage, temporary, version, architecture, depends):
     with tarfile.open(archive) as contents:
         for member in contents:
             path = Path(member.name)
-            expected_mode = 0o755 if member.isdir() or member.name == "./usr/bin/serein" else 0o644
+            expected_mode = 0o755 if member.isdir() or member.name == "./usr/bin/rustcord" else 0o644
             if (path.is_absolute() or ".." in path.parts
                     or not (member.isfile() or member.isdir())
                     or member.mode != expected_mode or member.uid or member.gid):
@@ -103,7 +103,7 @@ def smoke(package, stage, temporary, version, architecture, depends):
     if payload_files(control) != ["control"]:
         raise ValueError("Unexpected control files or maintainer scripts")
     checked("desktop-file-validate", str(extracted / "usr/share/applications/cz.viceverse.serein.desktop"))
-    libraries = output("ldd", str(extracted / "usr/bin/serein"))
+    libraries = output("ldd", str(extracted / "usr/bin/rustcord"))
     if "not found" in libraries:
         raise ValueError(f"Unresolved packaged executable dependencies:\n{libraries}")
     print(f"Debian package smoke passed: {len(expected)} files; executable, desktop entry, "
@@ -118,7 +118,7 @@ def package(root, application_version):
     if machine is None:
         raise ValueError(f"Unverified Debian package architecture: {architecture}")
     # Rust and dpkg must agree: do not label a cross-built binary as the host arch.
-    with (root / "serein").open("rb") as executable:
+    with (root / "rustcord").open("rb") as executable:
         header = executable.read(20)
     if (len(header) != 20 or header[:6] != b"\x7fELF\x02\x01"
             or struct.unpack("<H", header[18:20])[0] != machine):
@@ -139,7 +139,7 @@ def package(root, application_version):
             "Package: serein\nArchitecture: any\nDescription: Unofficial native Discord client\n",
             encoding="utf-8")
         (stage / "DEBIAN").mkdir()
-        dependencies = output("dpkg-shlibdeps", "-O", "debian/serein/usr/bin/serein", cwd=temporary)
+        dependencies = output("dpkg-shlibdeps", "-O", "debian/serein/usr/bin/rustcord", cwd=temporary)
         depends = next(line.removeprefix("shlibs:Depends=") for line in dependencies.splitlines()
                        if line.startswith("shlibs:Depends="))
         # dlopen libraries and desktop services are invisible to ELF DT_NEEDED.
@@ -162,7 +162,7 @@ def package(root, application_version):
             " Unofficial, experimental, and not endorsed by Discord.\n",
             encoding="utf-8")
         for path in [stage, *stage.rglob("*")]:
-            path.chmod(0o755 if path.is_dir() or path == stage / "usr/bin/serein" else 0o644)
+            path.chmod(0o755 if path.is_dir() or path == stage / "usr/bin/rustcord" else 0o644)
         checked("desktop-file-validate", str(stage / "usr/share/applications/cz.viceverse.serein.desktop"))
         artifact = root / f"serein_{version}_{architecture}.deb"
         candidate = temporary / artifact.name
@@ -177,7 +177,7 @@ def package(root, application_version):
 
 def native_elf(root):
     machine = {"x86_64": 62, "aarch64": 183}.get(platform.machine())
-    with (root / "serein").open("rb") as stream:
+    with (root / "rustcord").open("rb") as stream:
         header = stream.read(20)
     if (sys.platform != "linux" or machine is None or len(header) != 20
             or header[:6] != b"\x7fELF\x02\x01"
@@ -221,7 +221,7 @@ def native_package(root, application_version, format):
         stage = temporary / "payload"
         stage_payload(root, stage)
         checked("desktop-file-validate", str(stage / "usr/share/applications/cz.viceverse.serein.desktop"))
-        libraries = output("ldd", str(stage / "usr/bin/serein"))
+        libraries = output("ldd", str(stage / "usr/bin/rustcord"))
         if "not found" in libraries:
             raise ValueError(f"Unresolved packaged executable dependencies:\n{libraries}")
         if format == "rpm":
@@ -261,7 +261,7 @@ def rpm_package(temporary, stage, application_version, distro):
         "\n%description\nNative Rust client for existing Discord accounts, including voice.\n"
         "Unofficial, experimental, and not endorsed by Discord.\n"
         "\n%install\nmkdir -p %{buildroot}\ncp -a %{_serein_payload}/. %{buildroot}/\n"
-        "\n%files\n%defattr(-,root,root,-)\n/usr/bin/serein\n"
+        "\n%files\n%defattr(-,root,root,-)\n/usr/bin/rustcord\n"
         "/usr/share/applications/cz.viceverse.serein.desktop\n/usr/share/doc/serein\n"
         + "".join(f"/{name}\n" for name in payload_files(stage) if name.startswith("usr/share/icons/")),
         encoding="utf-8")
@@ -280,7 +280,7 @@ def rpm_package(temporary, stage, application_version, distro):
     for line in listing.splitlines():
         name, mode, user, group = line.split("\t")
         path = stage / name.removeprefix("/")
-        expected_mode = 0o40755 if path.is_dir() else 0o100755 if name == "/usr/bin/serein" else 0o100644
+        expected_mode = 0o40755 if path.is_dir() else 0o100755 if name == "/usr/bin/rustcord" else 0o100644
         if (".." in Path(name).parts or not path.exists()
                 or int(mode, 8) != expected_mode or user != "root" or group != "root"):
             raise ValueError(f"Unexpected RPM payload entry: {line}")
@@ -344,7 +344,7 @@ def arch_package(temporary, stage, application_version, libraries):
                 raise ValueError(f"Unsafe Arch archive member: {member.name}")
             if member.name in {".PKGINFO", ".BUILDINFO", ".MTREE"}:
                 continue
-            expected_mode = 0o755 if member.isdir() or member.name == "usr/bin/serein" else 0o644
+            expected_mode = 0o755 if member.isdir() or member.name == "usr/bin/rustcord" else 0o644
             if member.mode != expected_mode:
                 raise ValueError(f"Incorrect Arch payload mode: {member.name}")
             contents.extract(member, extracted, filter="data")

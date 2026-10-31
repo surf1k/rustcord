@@ -59,7 +59,7 @@ trait Applications: Clone + Send + Sync + 'static {
 		&self,
 		id: Id,
 	) -> impl Future<Output = Result<Vec<discord_api::rpc::Asset>, &'static str>> + Send;
-	/// Ask Discord to proxy caller-supplied image URLs. Serein never fetches them itself.
+	/// Ask Discord to proxy caller-supplied image URLs. Rustcord never fetches them itself.
 	fn external(
 		&self,
 		id: Id,

@@ -398,7 +398,7 @@ impl Desktop {
 					ui.painter().rect_filled(mark, 14, p.accent);
 					ui::icons::paint(
 						ui.painter(),
-						ui::icons::Icon::Serein,
+						ui::icons::Icon::Rustcord,
 						mark.shrink(13.0),
 						p.accent_text,
 					);
@@ -495,7 +495,7 @@ impl Desktop {
 							ui.painter().rect_filled(mark, 6, p.accent);
 							ui::icons::paint(
 								ui.painter(),
-								ui::icons::Icon::Serein,
+								ui::icons::Icon::Rustcord,
 								mark.shrink(5.0),
 								p.accent_text,
 							);
@@ -668,7 +668,7 @@ impl Desktop {
 						if returning {
 							ui::design::secondary_icon_button(ui, ui::icons::Icon::Plus, label)
 						} else {
-							ui::design::primary_icon_button(ui, ui::icons::Icon::Serein, label)
+							ui::design::primary_icon_button(ui, ui::icons::Icon::Rustcord, label)
 						}
 					})
 					.inner;
@@ -715,7 +715,7 @@ impl Desktop {
 			ui.painter().rect_filled(mark, 13, p.accent);
 			ui::icons::paint(
 				ui.painter(),
-				ui::icons::Icon::Serein,
+				ui::icons::Icon::Rustcord,
 				mark.shrink(11.0),
 				p.accent_text,
 			);
